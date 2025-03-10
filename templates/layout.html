@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FRC Scouting Tool</title>
+</head>
+<body>
+    <header>
+        <h1>FRC Scouting Tool</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/scout">Scout Team</a></li>
+                <li><a href="/reports">View Reports</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>FRC Scouting Tool - Beta Version</p>
+    </footer>
+</body>
+</html>

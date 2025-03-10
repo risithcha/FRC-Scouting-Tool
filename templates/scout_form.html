@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Scout Team {{ team.team_number }}</h2>
+<h3>{{ team.nickname }}</h3>
+
+<form action="/submit_report" method="post">
+    <input type="hidden" name="team_number" value="{{ team.team_number }}"> 
+    <input type="hidden" name="team_name" value="{{ team.nickname }}">
+    
+    <div>
+        <label for="event">Event:</label>
+        <select id="event" name="event" required>
+            <option value="">Select an event</option>
+            {% for event in events %}
+            <option value="{{ event.key }}">{{ event.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="scout_name">Scout Name:</label>
+        <input type="text" id="scout_name" name="scout_name" required>
+    </div>
+    
+    <div>
+        <label for="auto_scoring">Autonomous Scoring:</label>
+        <textarea id="auto_scoring" name="auto_scoring" rows="3" required></textarea>
+    </div>
+    
+    <div>
+        <label for="teleop_scoring">Teleop Scoring:</label>
+        <textarea id="teleop_scoring" name="teleop_scoring" rows="3" required></textarea>
+    </div>
+    
+    <div>
+        <label for="endgame">Endgame Performance:</label>
+        <textarea id="endgame" name="endgame" rows="3" required></textarea>
+    </div>
+    
+    <div>
+        <label for="notes">Additional Notes:</label>
+        <textarea id="notes" name="notes" rows="5"></textarea>
+    </div>
+    
+    <button type="submit">Submit Report</button>
+</form>
+{% endblock %}

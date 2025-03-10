@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Scout a Team</h2>
+
+<form method="get">
+    <label for="team_number">Team Number:</label>
+    <input type="text" id="team_number" name="team_number" required>
+    <button type="submit">Look Up Team</button>
+</form>
+{% endblock %}

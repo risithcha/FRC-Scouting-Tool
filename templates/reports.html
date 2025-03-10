@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>All Scouting Reports</h2>
+
+{% if reports %}
+    <table>
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>Event</th>
+                <th>Scout</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.team_number }} ({{ report.team_name }})</td>
+                <td>{{ report.event }}</td>
+                <td>{{ report.scout_name }}</td>
+                <td>{{ report.timestamp }}</td>
+                <td><a href="/report/{{ report.filename }}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No reports found.</p>
+{% endif %}
+{% endblock %}
