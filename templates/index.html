@@ -3,10 +3,18 @@
 {% block content %}
 <h2>Welcome to the FRC Scouting Tool</h2>
 
-<p>Use this tool to scout FRC teams and record your observations.</p>
+<p>Use this tool to scout FRC teams and record your observations during competitions.</p>
 
-<ul>
-    <li><a href="/scout">Scout a Team</a></li>
-    <li><a href="/reports">View All Reports</a></li>
-</ul>
+<div class="feature-links">
+    <a href="/scout" class="feature-link">
+        <i class="fas fa-clipboard-list"></i>
+        <h3>Scout a Team</h3>
+        <p>Record observations about a team's performance</p>
+    </a>
+    <a href="/reports" class="feature-link">
+        <i class="fas fa-file-alt"></i>
+        <h3>View All Reports</h3>
+        <p>Browse and analyze all submitted scouting reports</p>
+    </a>
+</div>
 {% endblock %}

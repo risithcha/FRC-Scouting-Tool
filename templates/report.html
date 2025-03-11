@@ -1,31 +1,43 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Scouting Report: Team {{ report.team_number }}</h2>
-<h3>{{ report.team_name }}</h3>
+<div class="report-container">
+    <div class="report-header">
+        <h2>Scouting Report: Team {{ report.team_number }}</h2>
+        <h3>{{ report.team_name }}</h3>
+        
+        <p><strong>Event:</strong> {{ report.event }}</p>
+        <p><strong>Scout:</strong> {{ report.scout_name }}</p>
+        <p><strong>Date:</strong> {{ report.timestamp }}</p>
+    </div>
 
-<div>
-    <p><strong>Event:</strong> {{ report.event }}</p>
-    <p><strong>Scout:</strong> {{ report.scout_name }}</p>
-    <p><strong>Date:</strong> {{ report.timestamp }}</p>
+    <div class="report-section">
+        <h4>Autonomous Scoring</h4>
+        <p>{{ report.auto_scoring }}</p>
+    </div>
+
+    <div class="report-section">
+        <h4>Teleop Scoring</h4>
+        <p>{{ report.teleop_scoring }}</p>
+    </div>
+
+    <div class="report-section">
+        <h4>Endgame Performance</h4>
+        <p>{{ report.endgame }}</p>
+    </div>
+
+    <div class="report-section">
+        <h4>Additional Notes</h4>
+        <p>{{ report.notes }}</p>
+    </div>
+
+    {% if report.ai_insights %}
+    <div class="ai-insights">
+        <h4>AI Analysis</h4>
+        <p>{{ report.ai_insights }}</p>
+    </div>
+    {% endif %}
+
+    <p><a href="/reports"><i class="fas fa-arrow-left"></i> Back to All Reports</a></p>
 </div>
-
-<h4>Autonomous Scoring</h4>
-<p>{{ report.auto_scoring }}</p>
-
-<h4>Teleop Scoring</h4>
-<p>{{ report.teleop_scoring }}</p>
-
-<h4>Endgame Performance</h4>
-<p>{{ report.endgame }}</p>
-
-<h4>Additional Notes</h4>
-<p>{{ report.notes }}</p>
-
-{% if report.ai_insights %}
-<h4>AI Analysis</h4>
-<p>{{ report.ai_insights }}</p>
-{% endif %}
-
-<p><a href="/reports">Back to All Reports</a></p>
 {% endblock %}
