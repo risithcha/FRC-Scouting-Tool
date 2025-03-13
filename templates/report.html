@@ -3,38 +3,137 @@
 {% block content %}
 <div class="report-container">
     <div class="report-header">
-        <h2>Scouting Report: Team {{ report.team_number }}</h2>
+        <h2>Match Report: Team {{ report.team_number }}</h2>
         <h3>{{ report.team_name }}</h3>
         
         <p><strong>Event:</strong> {{ report.event }}</p>
+        <p><strong>Match:</strong> {{ report.match_number }}</p>
         <p><strong>Scout:</strong> {{ report.scout_name }}</p>
         <p><strong>Date:</strong> {{ report.timestamp }}</p>
     </div>
 
     <div class="report-section">
-        <h4>Autonomous Scoring</h4>
-        <p>{{ report.auto_scoring }}</p>
+        <h4>Autonomous Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>Robot Movement:</strong></td>
+                <td>{{ report.autonomous.move|title }}</td>
+            </tr>
+            <tr>
+                <td><strong>Coral Count:</strong></td>
+                <td>{{ report.autonomous.coral_count }}</td>
+            </tr>
+            <tr>
+                <td><strong>Auto Score:</strong></td>
+                <td>{{ report.autonomous.score }} points</td>
+            </tr>
+        </table>
+        
+        <h5>Scoring Breakdown</h5>
+        <table class="data-table">
+            <tr>
+                <td>L4 (Speaker):</td>
+                <td>{{ report.autonomous.scoring.l4_count }}</td>
+            </tr>
+            <tr>
+                <td>L3 (Speaker):</td>
+                <td>{{ report.autonomous.scoring.l3_count }}</td>
+            </tr>
+            <tr>
+                <td>L2 (Amp):</td>
+                <td>{{ report.autonomous.scoring.l2_count }}</td>
+            </tr>
+            <tr>
+                <td>L1 (Trap):</td>
+                <td>{{ report.autonomous.scoring.l1_count }}</td>
+            </tr>
+            <tr>
+                <td>Net (Source):</td>
+                <td>{{ report.autonomous.scoring.net_count }}</td>
+            </tr>
+        </table>
+        
+        {% if report.autonomous.notes %}
+        <p><strong>Notes:</strong> {{ report.autonomous.notes }}</p>
+        {% endif %}
     </div>
 
     <div class="report-section">
-        <h4>Teleop Scoring</h4>
-        <p>{{ report.teleop_scoring }}</p>
+        <h4>Teleop Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>Coral Count:</strong></td>
+                <td>{{ report.teleop.coral_count }}</td>
+            </tr>
+            <tr>
+                <td><strong>Teleop Score:</strong></td>
+                <td>{{ report.teleop.score }} points</td>
+            </tr>
+            <tr>
+                <td><strong>Total Cycles:</strong></td>
+                <td>{{ report.teleop.cycles }}</td>
+            </tr>
+            <tr>
+                <td><strong>Successful Cycles:</strong></td>
+                <td>{{ report.teleop.successful_cycles }}</td>
+            </tr>
+            <tr>
+                <td><strong>Processor Used:</strong></td>
+                <td>{{ report.teleop.processor|title }}</td>
+            </tr>
+        </table>
+        
+        <h5>Scoring Breakdown</h5>
+        <table class="data-table">
+            <tr>
+                <td>L4 (Speaker):</td>
+                <td>{{ report.teleop.scoring.l4_count }}</td>
+            </tr>
+            <tr>
+                <td>L3 (Speaker):</td>
+                <td>{{ report.teleop.scoring.l3_count }}</td>
+            </tr>
+            <tr>
+                <td>L2 (Amp):</td>
+                <td>{{ report.teleop.scoring.l2_count }}</td>
+            </tr>
+            <tr>
+                <td>L1 (Trap):</td>
+                <td>{{ report.teleop.scoring.l1_count }}</td>
+            </tr>
+            <tr>
+                <td>Net (Source):</td>
+                <td>{{ report.teleop.scoring.net_count }}</td>
+            </tr>
+        </table>
+        
+        {% if report.teleop.notes %}
+        <p><strong>Notes:</strong> {{ report.teleop.notes }}</p>
+        {% endif %}
     </div>
 
     <div class="report-section">
         <h4>Endgame Performance</h4>
-        <p>{{ report.endgame }}</p>
+        <table class="data-table">
+            <tr>
+                <td><strong>End Position:</strong></td>
+                <td>{{ report.endgame.position|replace('_', ' ')|title }}</td>
+            </tr>
+            <tr>
+                <td><strong>Endgame Score:</strong></td>
+                <td>{{ report.endgame.score }} points</td>
+            </tr>
+        </table>
+        
+        {% if report.endgame.notes %}
+        <p><strong>Notes:</strong> {{ report.endgame.notes }}</p>
+        {% endif %}
     </div>
 
+    {% if report.additional_notes %}
     <div class="report-section">
         <h4>Additional Notes</h4>
-        <p>{{ report.notes }}</p>
-    </div>
-
-    {% if report.ai_insights %}
-    <div class="ai-insights">
-        <h4>AI Analysis</h4>
-        <p>{{ report.ai_insights }}</p>
+        <p>{{ report.additional_notes }}</p>
     </div>
     {% endif %}
 

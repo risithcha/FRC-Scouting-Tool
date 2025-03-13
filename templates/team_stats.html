@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="team-report-container">
+    <div class="team-header">
+        <h2>Team {{ team.team_number }} Performance Report</h2>
+        <h3>{{ team.nickname }}</h3>
+        
+        <p><strong>Event:</strong> {{ event_name }}</p>
+        <p><strong>Reports analyzed:</strong> {{ stats.games_played }}</p>
+    </div>
+
+    <div class="report-section">
+        <h4>Overall Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>Games Played:</strong></td>
+                <td>{{ stats.games_played }}</td>
+            </tr>
+            <tr>
+                <td><strong>% of Games Moved:</strong></td>
+                <td>{{ stats.percent_moved }}%</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="report-section">
+        <h4>Autonomous Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>% of Times Moved in Auto:</strong></td>
+                <td>{{ stats.auto.percent_moved }}%</td>
+            </tr>
+            <tr>
+                <td><strong>Average Number of Coral in Auto:</strong></td>
+                <td>{{ stats.auto.avg_coral }}</td>
+            </tr>
+            <tr>
+                <td><strong>Average Auto Score:</strong></td>
+                <td>{{ stats.auto.avg_score }} points</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="report-section">
+        <h4>Teleop Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>Average Corals Scored:</strong></td>
+                <td>{{ stats.teleop.avg_coral }}</td>
+            </tr>
+            <tr>
+                <td><strong>Average Score:</strong></td>
+                <td>{{ stats.teleop.avg_score }} points</td>
+            </tr>
+            <tr>
+                <td><strong>Average Number of Cycles:</strong></td>
+                <td>{{ stats.teleop.avg_cycles }}</td>
+            </tr>
+            <tr>
+                <td><strong>% of Successful Cycles:</strong></td>
+                <td>{{ stats.teleop.percent_successful_cycles }}%</td>
+            </tr>
+            <tr>
+                <td><strong>Average L4 Scores:</strong></td>
+                <td>{{ stats.teleop.avg_l4 }}</td>
+            </tr>
+            <tr>
+                <td><strong>Average Net Scores:</strong></td>
+                <td>{{ stats.teleop.avg_net }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="report-section">
+        <h4>Endgame Performance</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>% of Times Parked:</strong></td>
+                <td>{{ stats.endgame.percent_park }}%</td>
+            </tr>
+            <tr>
+                <td><strong>% of Times Shallow Climb:</strong></td>
+                <td>{{ stats.endgame.percent_shallow_climb }}%</td>
+            </tr>
+            <tr>
+                <td><strong>% of Times Deep Climb:</strong></td>
+                <td>{{ stats.endgame.percent_deep_climb }}%</td>
+            </tr>
+            <tr>
+                <td><strong>Average Endgame Points:</strong></td>
+                <td>{{ stats.endgame.avg_score }} points</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="report-section">
+        <h4>Individual Match Reports</h4>
+        <ul class="report-list">
+            {% for report in reports %}
+            <li>
+                <a href="{{ url_for('view_report', filename=report.filename) }}">
+                    Match {{ report.match_number }} - {{ report.timestamp }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <p><a href="{{ url_for('full_stats') }}" class="button">Back to Teams</a></p>
+</div>
+{% endblock %}

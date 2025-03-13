@@ -8,41 +8,327 @@
     <input type="hidden" name="team_number" value="{{ team.team_number }}"> 
     <input type="hidden" name="team_name" value="{{ team.nickname }}">
     
-    <div>
-        <label for="event">Event:</label>
-        <select id="event" name="event" required>
-            <option value="">Select an event</option>
-            {% for event in events %}
-            <option value="{{ event.key }}">{{ event.name }}</option>
-            {% endfor %}
-        </select>
+    <div class="scout-section">
+        <div class="form-group">
+            <label for="event">Event:</label>
+            <select id="event" name="event" required>
+                <option value="">Select an event</option>
+                {% for event in events %}
+                <option value="{{ event.key }}">{{ event.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group half">
+                <label for="scout_name">Scout Name:</label>
+                <input type="text" id="scout_name" name="scout_name" required>
+            </div>
+            
+            <div class="form-group half">
+                <label for="match_number">Match #:</label>
+                <input type="number" id="match_number" name="match_number" min="1" required>
+            </div>
+        </div>
     </div>
     
-    <div>
-        <label for="scout_name">Scout Name:</label>
-        <input type="text" id="scout_name" name="scout_name" required>
+    <div class="scout-section">
+        <h3>Autonomous</h3>
+        
+        <div class="form-group">
+            <div class="option-row">
+                <div class="option-label">Robot moved?</div>
+                <div class="option-buttons">
+                    <label class="option-btn">
+                        <input type="radio" name="auto_move" value="yes" required>
+                        <span>Yes</span>
+                    </label>
+                    <label class="option-btn">
+                        <input type="radio" name="auto_move" value="no">
+                        <span>No</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <h4>Scoring</h4>
+            <!-- Hidden because I'm too lazy to change the backend -->
+            
+            <div class="counter-row">
+                <div class="counter-label">L4 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="auto_l4_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L3 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="auto_l3_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L2 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="auto_l2_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L1 Trough</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="auto_l1_trough" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">Net</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="auto_net" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="form-group">
+            <label for="auto_notes">Notes:</label>
+            <textarea id="auto_notes" name="auto_notes" rows="2" placeholder="Auto period observations..."></textarea>
+        </div>
     </div>
     
-    <div>
-        <label for="auto_scoring">Autonomous Scoring:</label>
-        <textarea id="auto_scoring" name="auto_scoring" rows="3" required></textarea>
+    <div class="scout-section">
+        <h3>Teleop</h3>
+        
+        <div class="form-group">
+            <h4>Scoring</h4>
+            <!-- Hidden because I'm too lazy to change the backend -->
+            
+            <div class="counter-row">
+                <div class="counter-label">L4 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="teleop_l4_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L3 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="teleop_l3_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L2 Branch</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="teleop_l2_branch" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">L1 Trough</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="teleop_l1_trough" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">Net</div>
+                <div class="counter">
+                    <button type="button" class="counter-btn counter-minus">-</button>
+                    <input type="number" name="teleop_net" min="0" value="0" class="counter-input" readonly style="display: none;">
+                    <button type="button" class="counter-btn counter-plus">+</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="counter-row">
+                <div class="counter-label">Total Cycles</div>
+                <div class="counter">
+                    <input type="number" name="teleop_cycles" min="0" value="0" class="counter-input" readonly>
+                </div>
+            </div>
+            
+            <div class="counter-row">
+                <div class="counter-label">Successful Cycles</div>
+                <div class="counter">
+                    <input type="number" name="teleop_successful_cycles" min="0" value="0" class="counter-input" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="option-row">
+            <div class="option-label">Used Processor</div>
+            <div class="option-buttons">
+                <label class="option-btn">
+                    <input type="radio" name="teleop_processor" value="yes" required>
+                    <span>Yes</span>
+                </label>
+                <label class="option-btn">
+                    <input type="radio" name="teleop_processor" value="no">
+                    <span>No</span>
+                </label>
+            </div>
+        </div>
+        
+        
+        <div class="form-group">
+            <label for="teleop_notes">Notes:</label>
+            <textarea id="teleop_notes" name="teleop_notes" rows="2" placeholder="Teleop period observations..."></textarea>
+        </div>
     </div>
     
-    <div>
-        <label for="teleop_scoring">Teleop Scoring:</label>
-        <textarea id="teleop_scoring" name="teleop_scoring" rows="3" required></textarea>
-    </div>
-    
-    <div>
-        <label for="endgame">Endgame Performance:</label>
-        <textarea id="endgame" name="endgame" rows="3" required></textarea>
-    </div>
-    
-    <div>
-        <label for="notes">Additional Notes:</label>
-        <textarea id="notes" name="notes" rows="5"></textarea>
-    </div>
-    
-    <button type="submit">Submit Report</button>
-</form>
+    <div class="scout-section">
+        <h3>Endgame</h3>
+        
+        <div class="option-row">
+            <div class="option-label">Park</div>
+            <div class="option-buttons">
+                <label class="option-btn">
+                    <input type="radio" name="endgame_park" value="yes" required>
+                    <span>Yes</span>
+                </label>
+                <label class="option-btn">
+                    <input type="radio" name="endgame_park" value="no">
+                    <span>No</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="option-row">
+            <div class="option-label">Deep Climb</div>
+            <div class="option-buttons">
+                <label class="option-btn">
+                    <input type="radio" name="endgame_deep_climb" value="yes" required>
+                    <span>Yes</span>
+                </label>
+                <label class="option-btn">
+                    <input type="radio" name="endgame_deep_climb" value="no">
+                    <span>No</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="option-row">
+            <div class="option-label">Shallow Climb</div>
+            <div class="option-buttons">
+                <label class="option-btn">
+                    <input type="radio" name="endgame_shallow_climb" value="yes" required>
+                        <span>Yes</span>
+                    </label>
+                    <label class="option-btn">
+                        <input type="radio" name="endgame_shallow_climb" value="no">
+                        <span>No</span>
+                    </label>
+                </div>
+            </div>
+            
+            
+            <div class="form-group">
+                <label for="endgame_notes">Notes:</label>
+                <textarea id="endgame_notes" name="endgame_notes" rows="2" placeholder="Endgame observations..."></textarea>
+            </div>
+        </div>
+        
+        <div class="scout-section">
+            <div class="form-group">
+                <label for="additional_notes">Additional Comments:</label>
+                <textarea id="additional_notes" name="additional_notes" rows="3" placeholder="Any other observations about this team..."></textarea>
+            </div>
+        </div>
+        
+        <button type="submit" class="submit-button">Submit Report</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const minusBtns = document.querySelectorAll('.counter-btn.counter-minus');
+            const plusBtns = document.querySelectorAll('.counter-btn.counter-plus');
+            
+            minusBtns.forEach(btn => {
+                if (!btn.disabled) {
+                    btn.textContent = "M";
+                    btn.title = "Missed Attempt";
+                }
+            });
+            
+            plusBtns.forEach(btn => {
+                if (!btn.disabled) {
+                    btn.textContent = "S";
+                    btn.title = "Successful Attempt";
+                }
+            });
+            
+            const counters = document.querySelectorAll('.counter');
+            const teleopCycles = document.querySelector('input[name="teleop_cycles"]');
+            const teleopSuccessfulCycles = document.querySelector('input[name="teleop_successful_cycles"]');
+            
+            let totalMissed = 0;
+            let totalSuccessful = 0;
+            
+            counters.forEach(counter => {
+                const minusBtn = counter.querySelector('.counter-btn.counter-minus');
+                const plusBtn = counter.querySelector('.counter-btn.counter-plus');
+                const input = counter.querySelector('input');
+                
+                if (input.name === 'teleop_cycles' || input.name === 'teleop_successful_cycles') {
+                    return;
+                }
+                
+                if (minusBtn && !minusBtn.disabled) {
+                    minusBtn.addEventListener('click', function() {
+                        let value = parseInt(input.value) || 0;
+                        input.value = value + 1;
+                        
+                        if (input.name.startsWith('teleop_')) {
+                            totalMissed++;
+                            updateTotals();
+                        }
+                    });
+                }
+                
+                if (plusBtn && !plusBtn.disabled) {
+                    plusBtn.addEventListener('click', function() {
+                        let value = parseInt(input.value) || 0;
+                        input.value = value + 1;
+                        
+                        if (input.name.startsWith('teleop_')) {
+                            totalSuccessful++;
+                            updateTotals();
+                        }
+                    });
+                }
+            });
+            
+            function updateTotals() {
+                if (teleopCycles) {
+                    teleopCycles.value = totalMissed + totalSuccessful;
+                }
+                
+                if (teleopSuccessfulCycles) {
+                    teleopSuccessfulCycles.value = totalSuccessful;
+                }
+            }
+        });
+    </script>
 {% endblock %}

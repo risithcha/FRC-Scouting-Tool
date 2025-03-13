@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Full Stats</h2>
+
+<div class="teams-full_stats-container">
+    <table class="full_stats-table" id="full_stats-table">
+        <thead>
+            <tr>
+                <th class="team-col">Team</th>
+                <th class="games-col">Games</th>
+                <th class="moved-col">% Moved</th>
+                <th class="auto-col">Auto Performance</th>
+                <th class="teleop-col">Teleop Performance</th>
+                <th class="endgame-col">Endgame</th>
+                <th class="actions-col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr data-team="{{ team.team_number }}">
+                <td class="team-cell">
+                    <div class="team-number">{{ team.team_number }}</div>
+                    <div class="team-name">{{ team.team_name }}</div>
+                </td>
+                <td>{{ team.reports_count }}</td>
+                <td>{{ team.stats.percent_moved }}%</td>
+                
+                <td class="metrics-cell">
+                    <div><strong>Moved:</strong> {{ team.stats.auto.percent_moved }}%</div>
+                    <div><strong>Avg Corals:</strong> {{ team.stats.auto.avg_coral }}</div>
+                    <div><strong>Avg Score:</strong> {{ team.stats.auto.avg_score }}</div>
+                </td>
+                
+                <td class="metrics-cell">
+                    <div><strong>Avg Corals:</strong> {{ team.stats.teleop.avg_coral }}</div>
+                    <div><strong>Avg Score:</strong> {{ team.stats.teleop.avg_score }}</div>
+                    <div><strong>Avg Cycles:</strong> {{ team.stats.teleop.avg_cycles }}</div>
+                    <div><strong>Success Rate:</strong> {{ team.stats.teleop.percent_successful_cycles }}%</div>
+                    <div><strong>Avg L4:</strong> {{ team.stats.teleop.avg_l4 }}</div>
+                    <div><strong>Avg Net:</strong> {{ team.stats.teleop.avg_net }}</div>
+                </td>
+                
+                <td class="metrics-cell">
+                    <div><strong>Park %:</strong> {{ team.stats.endgame.percent_park }}%</div>
+                    <div><strong>Avg Points:</strong> {{ team.stats.endgame.avg_score }}</div>
+                </td>
+                
+                <td>
+                    <a href="{{ url_for('team_stats', team_number=team.team_number) }}" class="btn-link">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
