@@ -210,34 +210,27 @@ def submit_report():
     elif request.form.get("endgame_shallow_climb") == "yes":
         endgame_position = "shallow_climb"
     
-    # Calculate auto coral count
-    auto_coral_count = int(request.form.get("auto_l4_count") or 0) + int(request.form.get("auto_l3_count") or 0) + int(request.form.get("auto_l2_count") or 0) + int(request.form.get("auto_l1_count") or 0) + int(request.form.get("auto_net_count") or 0)
+    auto_coral_count = int(request.form.get("auto_l4_branch") or 0) + int(request.form.get("auto_l3_branch") or 0) + int(request.form.get("auto_l2_branch") or 0) + int(request.form.get("auto_l1_trough") or 0) + int(request.form.get("auto_net") or 0)
     
-    # Calculate teleop coral count
-    teleop_coral_count = int(request.form.get("teleop_l4_count") or 0) + int(request.form.get("teleop_l3_count") or 0) + int(request.form.get("teleop_l2_count") or 0) + int(request.form.get("teleop_l1_count") or 0) + int(request.form.get("teleop_net_count") or 0)
+    teleop_coral_count = int(request.form.get("teleop_l4_branch") or 0) + int(request.form.get("teleop_l3_branch") or 0) + int(request.form.get("teleop_l2_branch") or 0) + int(request.form.get("teleop_l1_trough") or 0) + int(request.form.get("teleop_net") or 0)
     
-    # Calculate scores based on point system
     # Auto scoring
     auto_score = 0
     if request.form.get("auto_move") == "yes":
         auto_score += 3  # 3 points for leaving starting zone
-    auto_score += int(request.form.get("auto_l4_count") or 0) * 7   # L4 branch: 7 pts
-    auto_score += int(request.form.get("auto_l3_count") or 0) * 6   # L3 branch: 6 pts
-    auto_score += int(request.form.get("auto_l2_count") or 0) * 4   # L2 branch: 4 pts
-    auto_score += int(request.form.get("auto_l1_count") or 0) * 3   # L1 trough: 3 pts
-    auto_score += int(request.form.get("auto_net_count") or 0) * 4  # Net: 4 pts
+    auto_score += int(request.form.get("auto_l4_branch") or 0) * 7   # L4 branch: 7 pts
+    auto_score += int(request.form.get("auto_l3_branch") or 0) * 6   # L3 branch: 6 pts
+    auto_score += int(request.form.get("auto_l2_branch") or 0) * 4   # L2 branch: 4 pts
+    auto_score += int(request.form.get("auto_l1_trough") or 0) * 3   # L1 trough: 3 pts
+    auto_score += int(request.form.get("auto_net") or 0) * 4  # Net: 4 pts
     
     # Teleop scoring
     teleop_score = 0
-    teleop_score += int(request.form.get("teleop_l4_count") or 0) * 5   # L4 branch: 5 pts
-    teleop_score += int(request.form.get("teleop_l3_count") or 0) * 4   # L3 branch: 4 pts
-    teleop_score += int(request.form.get("teleop_l2_count") or 0) * 3   # L2 branch: 3 pts
-    teleop_score += int(request.form.get("teleop_l1_count") or 0) * 2   # L1 trough: 2 pts
-    teleop_score += int(request.form.get("teleop_net_count") or 0) * 4  # Net: 4 pts
-    
-    # Add processor points if used
-    if request.form.get("teleop_processor") == "yes":
-        teleop_score += 6  # Processor: 6 pts
+    teleop_score += int(request.form.get("teleop_l4_branch") or 0) * 5   # L4 branch: 5 pts
+    teleop_score += int(request.form.get("teleop_l3_branch") or 0) * 4   # L3 branch: 4 pts
+    teleop_score += int(request.form.get("teleop_l2_branch") or 0) * 3   # L2 branch: 3 pts
+    teleop_score += int(request.form.get("teleop_l1_trough") or 0) * 2   # L1 trough: 2 pts
+    teleop_score += int(request.form.get("teleop_net") or 0) * 4  # Net: 4 pts
     
     # Endgame scoring
     endgame_score = 0
@@ -260,11 +253,11 @@ def submit_report():
             "coral_count": auto_coral_count,
             "score": auto_score,
             "scoring": {
-                "l4_count": int(request.form.get("auto_l4_count") or 0),
-                "l3_count": int(request.form.get("auto_l3_count") or 0),
-                "l2_count": int(request.form.get("auto_l2_count") or 0),
-                "l1_count": int(request.form.get("auto_l1_count") or 0),
-                "net_count": int(request.form.get("auto_net_count") or 0)
+                "l4_count": int(request.form.get("auto_l4_branch") or 0),
+                "l3_count": int(request.form.get("auto_l3_branch") or 0),
+                "l2_count": int(request.form.get("auto_l2_branch") or 0),
+                "l1_count": int(request.form.get("auto_l1_trough") or 0),
+                "net_count": int(request.form.get("auto_net") or 0)
             },
             "notes": request.form.get("auto_notes")
         },
@@ -275,11 +268,11 @@ def submit_report():
             "successful_cycles": int(request.form.get("teleop_successful_cycles") or 0),
             "processor": request.form.get("teleop_processor"),
             "scoring": {
-                "l4_count": int(request.form.get("teleop_l4_count") or 0),
-                "l3_count": int(request.form.get("teleop_l3_count") or 0),
-                "l2_count": int(request.form.get("teleop_l2_count") or 0),
-                "l1_count": int(request.form.get("teleop_l1_count") or 0),
-                "net_count": int(request.form.get("teleop_net_count") or 0)
+                "l4_count": int(request.form.get("teleop_l4_branch") or 0),
+                "l3_count": int(request.form.get("teleop_l3_branch") or 0),
+                "l2_count": int(request.form.get("teleop_l2_branch") or 0),
+                "l1_count": int(request.form.get("teleop_l1_trough") or 0),
+                "net_count": int(request.form.get("teleop_net") or 0)
             },
             "notes": request.form.get("teleop_notes")
         },
