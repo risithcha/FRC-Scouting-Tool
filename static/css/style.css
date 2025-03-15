@@ -105,46 +105,13 @@ main {
 }
 
 footer {
+    text-align: center;
+    padding: 15px 0;
     background-color: var(--blue);
     color: white;
-    padding: 8px 15px;
-    font-size: 0.85rem;
-    text-align: center;
     position: fixed;
     bottom: 0;
     width: 100%;
-    box-sizing: border-box;
-    z-index: 100;
-}
-
-.attribution-container {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.attr-title {
-    font-weight: bold;
-    margin: 0 0 2px 0;
-    color: white;
-}
-
-.acknowledgments {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.4;
-}
-
-.acknowledgments a {
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: underline;
-}
-
-.acknowledgments a:hover {
-    color: white;
-    text-decoration: underline;
 }
 
 .flash-messages {
@@ -560,16 +527,5 @@ tbody tr:hover {
     .option-btn {
         margin-bottom: 8px;
         width: 100%;
-    }
-}
-
-@media (max-width: 600px) {
-    footer {
-        padding: 5px 10px;
-        font-size: 0.75rem;
-    }
-    
-    .acknowledgments {
-        font-size: 0.7rem;
     }
 }

@@ -4,8 +4,6 @@ import json
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from dotenv import load_dotenv
-import mysql.connector
-from mysql.connector import pooling
 
 # Load environment variables
 load_dotenv()
@@ -20,64 +18,6 @@ os.makedirs(REPORTS_DIR, exist_ok=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "setup-a-key")
-
-# Configure the database
-DB_CONFIG = {
-    'host': os.getenv('MYSQL_HOST'),
-    'port': int(os.getenv('MYSQL_PORT', 3306)),
-    'user': os.getenv('MYSQL_USER'),
-    'password': os.getenv('MYSQL_PASSWORD'),
-    'database': os.getenv('MYSQL_DATABASE'),
-    'pool_size': 5
-}
-
-# Connection pool to save resources
-try:
-    connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        **DB_CONFIG
-    )
-    print("Database connection pool created successfully")
-    
-    # Make sure it worked
-    connection = connection_pool.get_connection()
-    if connection.is_connected():
-        print("Connected to MySQL database")
-        connection.close()
-except mysql.connector.Error as err:
-    print(f"Error connecting to MySQL: {err}")
-
-# Initialize the database tables
-def init_db():
-    try:
-        conn = connection_pool.get_connection()
-        cursor = conn.cursor()
-        
-        # Create tables if they don't exist
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS reports (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                team_number VARCHAR(10) NOT NULL,
-                team_name VARCHAR(255) NOT NULL,
-                event VARCHAR(50) NOT NULL,
-                scout_name VARCHAR(100) NOT NULL,
-                match_number INT NOT NULL,
-                timestamp DATETIME NOT NULL,
-                report_data JSON NOT NULL,
-                INDEX (team_number),
-                INDEX (event)
-            )
-        ''')
-        
-        conn.commit()
-        print("Database tables initialized")
-    except mysql.connector.Error as err:
-        print(f"Error initializing database: {err}")
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 # TBA API Functions
 def get_tba_data(endpoint):
@@ -101,130 +41,37 @@ def get_team_events(team_number):
 
 # Stores reports as JSON files
 def save_report(report_data):
-    # Save a scouting report to the database.
-    try:
-        conn = connection_pool.get_connection()
-        cursor = conn.cursor()
-        
-        team_number = report_data.get("team_number")
-        team_name = report_data.get("team_name")
-        event = report_data.get("event")
-        scout_name = report_data.get("scout_name")
-        match_number = report_data.get("match_number")
-        timestamp = datetime.datetime.now()
-        
-        query = """
-            INSERT INTO reports 
-            (team_number, team_name, event, scout_name, match_number, timestamp, report_data)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(query, (
-            team_number, 
-            team_name, 
-            event, 
-            scout_name, 
-            match_number, 
-            timestamp,
-            json.dumps(report_data)
-        ))
-        
-        conn.commit()
-        report_id = cursor.lastrowid
-        
-        # Uses a "filename" cause I'm too lazy to work more
-        return f"{team_number}_{int(timestamp.timestamp())}"
-    except mysql.connector.Error as err:
-        print(f"Error saving report: {err}")
-        raise
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    # Save a scouting report to JSON file.
+    team_number = report_data.get("team_number")
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{team_number}_{timestamp}.json"
+    filepath = os.path.join(REPORTS_DIR, filename)
+    
+    with open(filepath, "w") as f:
+        json.dump(report_data, f, indent=2)
+    
+    return filename
 
 def get_all_reports():
-    # Get all scouting reports from database
-    try:
-        conn = connection_pool.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        
-        query = "SELECT * FROM reports ORDER BY timestamp DESC"
-        cursor.execute(query)
-        
-        reports = []
-        for row in cursor.fetchall():
-            report = json.loads(row['report_data'])
-            # Same thing here, I'm just too lazy
-            report["filename"] = f"{row['team_number']}_{int(datetime.datetime.timestamp(row['timestamp']))}"
-            reports.append(report)
-            
-        return reports
-    except mysql.connector.Error as err:
-        print(f"Error fetching reports: {err}")
-        return []
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    # Gets all scouting reports.
+    reports = []
+    for filename in os.listdir(REPORTS_DIR):
+        if filename.endswith(".json"):
+            filepath = os.path.join(REPORTS_DIR, filename)
+            with open(filepath, "r") as f:
+                report = json.load(f)
+                report["filename"] = filename # Add's the filename to the report to retrieve later
+                reports.append(report)
+    return reports
 
 def get_report(filename):
-    # Finds a report using filename :O
+    # Gets a specific scouting report.
+    filepath = os.path.join(REPORTS_DIR, filename)
     try:
-        # Parse team number and timestamp from filename
-        parts = filename.split('_')
-        team_number = parts[0]
-        timestamp = int(parts[1].split('.')[0])
-        
-        conn = connection_pool.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        
-        # Finds the report and allows a bit of wiggle room
-        query = """
-            SELECT * FROM reports 
-            WHERE team_number = %s 
-            AND UNIX_TIMESTAMP(timestamp) BETWEEN %s - 5 AND %s + 5
-            LIMIT 1
-        """
-        cursor.execute(query, (team_number, timestamp, timestamp))
-        
-        row = cursor.fetchone()
-        if row:
-            return json.loads(row['report_data'])
+        with open(filepath, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
         return None
-    except mysql.connector.Error as err:
-        print(f"Error fetching report: {err}")
-        return None
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def get_team_reports(team_number):
-    # Gets all reports for a specific team from the database
-    try:
-        conn = connection_pool.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        
-        query = "SELECT * FROM reports WHERE team_number = %s ORDER BY match_number"
-        cursor.execute(query, (team_number,))
-        
-        reports = []
-        for row in cursor.fetchall():
-            report = json.loads(row['report_data'])
-            report["filename"] = f"{row['team_number']}_{int(datetime.datetime.timestamp(row['timestamp']))}"
-            reports.append(report)
-            
-        return reports
-    except mysql.connector.Error as err:
-        print(f"Error fetching team reports: {err}")
-        return []
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 def generate_team_stats(reports):
     stats = {
@@ -261,7 +108,7 @@ def generate_team_stats(reports):
     shallow_climb_count = 0
     deep_climb_count = 0
     
-    # Values for averaging
+    # Accumulate values for averaging
     auto_coral_total = 0
     auto_score_total = 0
     teleop_coral_total = 0
@@ -354,6 +201,7 @@ def scout_team(team_number):
 
 @app.route("/submit_report", methods=["POST"])
 def submit_report():
+    # Determine endgame position based on form inputs
     endgame_position = "none"
     if request.form.get("endgame_park") == "yes":
         endgame_position = "park"
@@ -366,6 +214,7 @@ def submit_report():
     
     teleop_coral_count = int(request.form.get("teleop_l4_branch") or 0) + int(request.form.get("teleop_l3_branch") or 0) + int(request.form.get("teleop_l2_branch") or 0) + int(request.form.get("teleop_l1_trough") or 0) + int(request.form.get("teleop_net") or 0)
     
+    # Auto scoring
     auto_score = 0
     if request.form.get("auto_move") == "yes":
         auto_score += 3  # 3 points for leaving starting zone
@@ -375,6 +224,7 @@ def submit_report():
     auto_score += int(request.form.get("auto_l1_trough") or 0) * 3   # L1 trough: 3 pts
     auto_score += int(request.form.get("auto_net") or 0) * 4  # Net: 4 pts
     
+    # Teleop scoring
     teleop_score = 0
     teleop_score += int(request.form.get("teleop_l4_branch") or 0) * 5   # L4 branch: 5 pts
     teleop_score += int(request.form.get("teleop_l3_branch") or 0) * 4   # L3 branch: 4 pts
@@ -382,6 +232,7 @@ def submit_report():
     teleop_score += int(request.form.get("teleop_l1_trough") or 0) * 2   # L1 trough: 2 pts
     teleop_score += int(request.form.get("teleop_net") or 0) * 4  # Net: 4 pts
     
+    # Endgame scoring
     endgame_score = 0
     if endgame_position == "park":
         endgame_score = 2  # Park: 2 pts
@@ -390,6 +241,7 @@ def submit_report():
     elif endgame_position == "deep_climb":
         endgame_score = 12  # Deep climb: 12 pts
     
+    # Build a structured report from the form data
     report_data = {
         "team_number": request.form.get("team_number"),
         "team_name": request.form.get("team_name"),
@@ -437,6 +289,7 @@ def submit_report():
     }
     
     
+    # Save the filename of the report
     filename = save_report(report_data)
     
     flash("Report submitted successfully!")
@@ -457,20 +310,32 @@ def view_report(filename):
 
 @app.route("/team_stats/<team_number>")
 def team_stats(team_number):
+    # Get team info from TBA API
     team = get_team_info(team_number)
     if "error" in team:
         flash("Team not found")
         return redirect(url_for("full_stats"))
     
-    reports = get_team_reports(team_number)
+    # Get all reports for this team
+    reports = []
+    for filename in os.listdir(REPORTS_DIR):
+        if filename.startswith(f"{team_number}_") and filename.endswith(".json"):
+            report_path = os.path.join(REPORTS_DIR, filename)
+            with open(report_path, 'r') as f:
+                report = json.load(f)
+                report['filename'] = filename
+                reports.append(report)
     
+    # Sort reports by match number if available
     def get_match_number(report):
         return int(report.get("match_number", 0))
     
     reports.sort(key=get_match_number)
     
+    # Generate statistics
     stats = generate_team_stats(reports)
     
+    # Get event name from the first report, or default
     event_name = "All Events"
     if reports and 'event' in reports[0]:
         event_key = reports[0]['event']
@@ -482,8 +347,13 @@ def team_stats(team_number):
 
 @app.route("/full_stats")
 def full_stats():
-    # Get all reports from the database
-    all_reports = get_all_reports()
+    # Get all reports
+    all_reports = []
+    for filename in os.listdir(REPORTS_DIR):
+        if filename.endswith(".json"):
+            with open(os.path.join(REPORTS_DIR, filename), 'r') as f:
+                report = json.load(f)
+                all_reports.append(report)
     
     # Group reports by team
     teams_data = {}
@@ -501,6 +371,7 @@ def full_stats():
     for team_number, data in teams_data.items():
         data["stats"] = generate_team_stats(data["reports"])
     
+    # Convert to sorted list for template
     teams_list = [
         {
             "team_number": team_number,
@@ -512,8 +383,6 @@ def full_stats():
     ]
     
     return render_template("full_stats.html", teams=teams_list)
-
-init_db()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
