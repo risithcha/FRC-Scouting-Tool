@@ -25,6 +25,24 @@
     </div>
 
     <div class="report-section">
+        <h4>TBA Performance Metrics ({{ event_name }})</h4>
+        <table class="data-table">
+            <tr>
+                <td><strong>OPR (Offensive Power Rating):</strong></td>
+                <td>{{ opr_data.opr }}</td>
+            </tr>
+            <tr>
+                <td><strong>DPR (Defensive Power Rating):</strong></td>
+                <td>{{ opr_data.dpr }}</td>
+            </tr>
+            <tr>
+                <td><strong>CCWM (Calculated Contribution to Win Margin):</strong></td>
+                <td>{{ opr_data.ccwm }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="report-section">
         <h4>Autonomous Performance</h4>
         <table class="data-table">
             <tr>

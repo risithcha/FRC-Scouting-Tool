@@ -2,12 +2,15 @@
 
 {% block content %}
 <h2>Full Stats</h2>
+<p>Teams sorted by current ranking at event</p>
 
 <div class="teams-full_stats-container">
     <table class="full_stats-table" id="full_stats-table">
         <thead>
             <tr>
+                <th class="rank-col">Rank</th>
                 <th class="team-col">Team</th>
+                <th class="record-col">Record</th>
                 <th class="games-col">Games</th>
                 <th class="moved-col">% Moved</th>
                 <th class="auto-col">Auto Performance</th>
@@ -19,10 +22,12 @@
         <tbody>
             {% for team in teams %}
             <tr data-team="{{ team.team_number }}">
+                <td class="rank-cell">{{ team.rank }}</td>
                 <td class="team-cell">
                     <div class="team-number">{{ team.team_number }}</div>
                     <div class="team-name">{{ team.team_name }}</div>
                 </td>
+                <td>{{ team.record }}</td>
                 <td>{{ team.reports_count }}</td>
                 <td>{{ team.stats.percent_moved }}%</td>
                 

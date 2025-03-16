@@ -4,17 +4,14 @@ import json
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from dotenv import load_dotenv
+from drive_integration import upload_to_drive, get_all_files_from_drive, download_file_from_drive,find_file_by_name
 
 # Load environment variables
 load_dotenv()
 
 # Configuration
 TBA_API_KEY = os.getenv("TBA_API_KEY")
-DATA_DIR = "data"
-REPORTS_DIR = os.path.join(DATA_DIR, "reports")
-
-# Makes sure that the directory exist
-os.makedirs(REPORTS_DIR, exist_ok=True)
+GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "setup-a-key")
@@ -39,39 +36,91 @@ def get_team_events(team_number):
     year = datetime.datetime.now().year
     return get_tba_data(f"team/frc{team_number}/events/{year}")
 
-# Stores reports as JSON files
+def get_team_oprs(event_key, team_number):
+    # Gets OPR, DPR, and CCWM data for a specific team at an event
+    oprs_data = get_tba_data(f"event/{event_key}/oprs")
+    if "error" in oprs_data:
+        return {"opr": 0, "dpr": 0, "ccwm": 0}
+    
+    # Extract just this team's data
+    team_key = f"frc{team_number}"
+    return {
+        "opr": round(oprs_data.get("oprs", {}).get(team_key, 0), 2),
+        "dpr": round(oprs_data.get("dprs", {}).get(team_key, 0), 2),
+        "ccwm": round(oprs_data.get("ccwms", {}).get(team_key, 0), 2)
+    }
+
+# Save and retrieve reports from Google Drive
 def save_report(report_data):
-    # Save a scouting report to JSON file.
+    # Save a scouting report to Google Drive
     team_number = report_data.get("team_number")
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{team_number}_{timestamp}.json"
-    filepath = os.path.join(REPORTS_DIR, filename)
     
-    with open(filepath, "w") as f:
-        json.dump(report_data, f, indent=2)
+    # Upload directly to Google Drive
+    file_id = upload_to_drive(report_data, filename, GOOGLE_DRIVE_FOLDER_ID)
+    
+    if not file_id:
+        print("Failed to upload report to Google Drive")
     
     return filename
 
 def get_all_reports():
-    # Gets all scouting reports.
+    # Gets all scouting reports from Google Drive
     reports = []
-    for filename in os.listdir(REPORTS_DIR):
-        if filename.endswith(".json"):
-            filepath = os.path.join(REPORTS_DIR, filename)
-            with open(filepath, "r") as f:
-                report = json.load(f)
-                report["filename"] = filename # Add's the filename to the report to retrieve later
+    files = get_all_files_from_drive(GOOGLE_DRIVE_FOLDER_ID)
+    
+    for file in files:
+        file_content = download_file_from_drive(file['id'])
+        if file_content:
+            try:
+                report = json.loads(file_content)
+                report["filename"] = file['name']  # Add filename to the report
+                
+                # Make sure required fields exist
+                if "team_number" not in report:
+                    print(f"Warning: File {file['name']} missing required field 'team_number'")
+                    report["team_number"] = file['name'].split('_')[0] if '_' in file['name'] else "unknown"
+                
                 reports.append(report)
+            except json.JSONDecodeError as e:
+                print(f"Error parsing JSON from file {file['name']}: {e}")
+    
     return reports
 
 def get_report(filename):
-    # Gets a specific scouting report.
-    filepath = os.path.join(REPORTS_DIR, filename)
-    try:
-        with open(filepath, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
+    # Gets a specific scouting report from Google Drive
+    file = find_file_by_name(filename, GOOGLE_DRIVE_FOLDER_ID)
+    if not file:
         return None
+        
+    file_content = download_file_from_drive(file['id'])
+    if not file_content:
+        return None
+        
+    try:
+        return json.loads(file_content)
+    except json.JSONDecodeError:
+        return None
+
+def get_team_reports(team_number):
+    # Gets all reports for a specific team from Google Drive
+    all_reports = get_all_reports()
+    team_reports = []
+    
+    for report in all_reports:
+        if report.get("team_number") == team_number:
+            team_reports.append(report)
+    
+    # Sort reports by match number
+    def get_match_number(report):
+        try:
+            return int(report.get("match_number", 0))
+        except ValueError:
+            return 0
+    
+    team_reports.sort(key=get_match_number)
+    return team_reports
 
 def generate_team_stats(reports):
     stats = {
@@ -108,7 +157,7 @@ def generate_team_stats(reports):
     shallow_climb_count = 0
     deep_climb_count = 0
     
-    # Accumulate values for averaging
+    # Values for averaging
     auto_coral_total = 0
     auto_score_total = 0
     teleop_coral_total = 0
@@ -201,7 +250,6 @@ def scout_team(team_number):
 
 @app.route("/submit_report", methods=["POST"])
 def submit_report():
-    # Determine endgame position based on form inputs
     endgame_position = "none"
     if request.form.get("endgame_park") == "yes":
         endgame_position = "park"
@@ -210,27 +258,27 @@ def submit_report():
     elif request.form.get("endgame_shallow_climb") == "yes":
         endgame_position = "shallow_climb"
     
-    auto_coral_count = int(request.form.get("auto_l4_branch") or 0) + int(request.form.get("auto_l3_branch") or 0) + int(request.form.get("auto_l2_branch") or 0) + int(request.form.get("auto_l1_trough") or 0) + int(request.form.get("auto_net") or 0)
-    
-    teleop_coral_count = int(request.form.get("teleop_l4_branch") or 0) + int(request.form.get("teleop_l3_branch") or 0) + int(request.form.get("teleop_l2_branch") or 0) + int(request.form.get("teleop_l1_trough") or 0) + int(request.form.get("teleop_net") or 0)
-    
+    # Auto scoring calculation - updated to use successful attempts only :)
+    auto_coral_count = int(request.form.get("auto_l4_branch_successful") or 0) + int(request.form.get("auto_l3_branch_successful") or 0) + int(request.form.get("auto_l2_branch_successful") or 0) + int(request.form.get("auto_l1_trough_successful") or 0) + int(request.form.get("auto_net_successful") or 0)
+
+    # Teleop scoring calculation - updated to use successful attempts only :)
+    teleop_coral_count = int(request.form.get("teleop_l4_branch_successful") or 0) + int(request.form.get("teleop_l3_branch_successful") or 0) + int(request.form.get("teleop_l2_branch_successful") or 0) + int(request.form.get("teleop_l1_trough_successful") or 0) + int(request.form.get("teleop_net_successful") or 0)
+
     # Auto scoring
     auto_score = 0
-    if request.form.get("auto_move") == "yes":
-        auto_score += 3  # 3 points for leaving starting zone
-    auto_score += int(request.form.get("auto_l4_branch") or 0) * 7   # L4 branch: 7 pts
-    auto_score += int(request.form.get("auto_l3_branch") or 0) * 6   # L3 branch: 6 pts
-    auto_score += int(request.form.get("auto_l2_branch") or 0) * 4   # L2 branch: 4 pts
-    auto_score += int(request.form.get("auto_l1_trough") or 0) * 3   # L1 trough: 3 pts
-    auto_score += int(request.form.get("auto_net") or 0) * 4  # Net: 4 pts
+    auto_score += int(request.form.get("auto_l4_branch_successful") or 0) * 7   # L4 branch: 7 pts
+    auto_score += int(request.form.get("auto_l3_branch_successful") or 0) * 6   # L3 branch: 6 pts
+    auto_score += int(request.form.get("auto_l2_branch_successful") or 0) * 4   # L2 branch: 4 pts 
+    auto_score += int(request.form.get("auto_l1_trough_successful") or 0) * 3   # L1 trough: 3 pts
+    auto_score += int(request.form.get("auto_net_successful") or 0) * 4         # Net: 4 pt
     
-    # Teleop scoring
+    # Teleop scoring - updated to use successful attempts only :)
     teleop_score = 0
-    teleop_score += int(request.form.get("teleop_l4_branch") or 0) * 5   # L4 branch: 5 pts
-    teleop_score += int(request.form.get("teleop_l3_branch") or 0) * 4   # L3 branch: 4 pts
-    teleop_score += int(request.form.get("teleop_l2_branch") or 0) * 3   # L2 branch: 3 pts
-    teleop_score += int(request.form.get("teleop_l1_trough") or 0) * 2   # L1 trough: 2 pts
-    teleop_score += int(request.form.get("teleop_net") or 0) * 4  # Net: 4 pts
+    teleop_score += int(request.form.get("teleop_l4_branch_successful") or 0) * 5   # L4 branch: 5 pts
+    teleop_score += int(request.form.get("teleop_l3_branch_successful") or 0) * 4   # L3 branch: 4 pts
+    teleop_score += int(request.form.get("teleop_l2_branch_successful") or 0) * 3   # L2 branch: 3 pts
+    teleop_score += int(request.form.get("teleop_l1_trough_successful") or 0) * 2   # L1 trough: 2 pts
+    teleop_score += int(request.form.get("teleop_net_successful") or 0) * 4  # Net: 4 pts
     
     # Endgame scoring
     endgame_score = 0
@@ -241,7 +289,7 @@ def submit_report():
     elif endgame_position == "deep_climb":
         endgame_score = 12  # Deep climb: 12 pts
     
-    # Build a structured report from the form data
+    # Build a report from the form data
     report_data = {
         "team_number": request.form.get("team_number"),
         "team_name": request.form.get("team_name"),
@@ -297,7 +345,22 @@ def submit_report():
 
 @app.route("/reports")
 def reports():
-    return render_template("view_report.html", reports=get_all_reports())
+    # Pagination!
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 1, type=int)
+    
+    # Get all reports
+    all_reports = get_all_reports()
+    
+    # Pagination values!
+    total_reports = len(all_reports)
+    total_pages = (total_reports + per_page - 1) // per_page
+    
+    start_idx = (page - 1) * per_page
+    end_idx = min(start_idx + per_page, total_reports)
+    paginated_reports = all_reports[start_idx:end_idx]
+    
+    return render_template("view_report.html", reports=paginated_reports,page=page,per_page=per_page,total_reports=total_reports,total_pages=total_pages)
 
 @app.route("/report/<filename>")
 def view_report(filename):
@@ -316,44 +379,47 @@ def team_stats(team_number):
         flash("Team not found")
         return redirect(url_for("full_stats"))
     
-    # Get all reports for this team
-    reports = []
-    for filename in os.listdir(REPORTS_DIR):
-        if filename.startswith(f"{team_number}_") and filename.endswith(".json"):
-            report_path = os.path.join(REPORTS_DIR, filename)
-            with open(report_path, 'r') as f:
-                report = json.load(f)
-                report['filename'] = filename
-                reports.append(report)
-    
-    # Sort reports by match number if available
-    def get_match_number(report):
-        return int(report.get("match_number", 0))
-    
-    reports.sort(key=get_match_number)
+    # Get all reports for this team from Google Drive
+    reports = get_team_reports(team_number)
     
     # Generate statistics
     stats = generate_team_stats(reports)
     
-    # Get event name from the first report, or default
+    # Get event name from the first report (heh heh, I made the default the event we're at)
     event_name = "All Events"
+    event_key = "2025wabon"
     if reports and 'event' in reports[0]:
         event_key = reports[0]['event']
         event = get_tba_data(f"event/{event_key}")
         if event and "error" not in event:
             event_name = event.get('name', event_key)
     
-    return render_template("team_stats.html", team=team, stats=stats, reports=reports, event_name=event_name)
+    opr_data = get_team_oprs(event_key, team_number)
+    
+    return render_template("team_stats.html", team=team, stats=stats, reports=reports, event_name=event_name, opr_data=opr_data)
 
 @app.route("/full_stats")
 def full_stats():
-    # Get all reports
-    all_reports = []
-    for filename in os.listdir(REPORTS_DIR):
-        if filename.endswith(".json"):
-            with open(os.path.join(REPORTS_DIR, filename), 'r') as f:
-                report = json.load(f)
-                all_reports.append(report)
+    # Get all reports from Google Drive
+    all_reports = get_all_reports()
+    
+    # Determine which event to use for rankings
+    event_key = "2025wabon"  # Default to Bonney Lake event
+    
+    # Get rankings data from TBA
+    rankings_data = get_tba_data(f"event/{event_key}/rankings")
+    rankings_dict = {}
+    
+    # Process rankings data
+    if rankings_data and "rankings" in rankings_data:
+        for team_ranking in rankings_data["rankings"]:
+            team_key = team_ranking["team_key"]
+            team_number = team_key.replace("frc", "")
+            rankings_dict[team_number] = {
+                "rank": team_ranking["rank"],
+                "record": f"{team_ranking.get('record', {}).get('wins', 0)}-{team_ranking.get('record', {}).get('losses', 0)}-{team_ranking.get('record', {}).get('ties', 0)}",
+                "ranking_score": team_ranking.get("sort_orders", [0])[0]
+            }
     
     # Group reports by team
     teams_data = {}
@@ -370,21 +436,33 @@ def full_stats():
     # Calculate statistics for each team
     for team_number, data in teams_data.items():
         data["stats"] = generate_team_stats(data["reports"])
+        
+        # Add ranking data if available
+        if team_number in rankings_dict:
+            data["ranking"] = rankings_dict[team_number]
+        else:
+            data["ranking"] = {"rank": 999, "record": "0-0-0", "ranking_score": 0}
     
-    # Convert to sorted list for template
-    teams_list = [
-        {
+    # Convert to list
+    teams_list = []
+    for team_number, data in teams_data.items():
+        teams_list.append({
             "team_number": team_number,
             "team_name": data["team_info"].get("nickname", f"Team {team_number}"),
             "reports_count": len(data["reports"]),
-            "stats": data["stats"]
-        }
-        for team_number, data in teams_data.items()
-    ]
+            "stats": data["stats"],
+            "rank": data.get("ranking", {}).get("rank", 999),
+            "record": data.get("ranking", {}).get("record", "0-0-0"),
+            "ranking_score": data.get("ranking", {}).get("ranking_score", 0)
+        })
     
-    return render_template("full_stats.html", teams=teams_list)
+    # Sort teams by rank
+    def get_team_rank(team):
+        return team["rank"]
+    
+    teams_list.sort(key=get_team_rank)
+    
+    return render_template("full_stats.html", teams=teams_list, event_key=event_key)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-    #I wanna crash out

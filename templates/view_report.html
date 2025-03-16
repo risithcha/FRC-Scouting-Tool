@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2>All Scouting Reports</h2>
+<p>Showing {{ reports|length }} of {{ total_reports }} reports (Page {{ page }} of {{ total_pages }})</p>
 
 {% if reports %}
     <table>
@@ -26,6 +27,39 @@
             {% endfor %}
         </tbody>
     </table>
+    
+    <!-- Pagination! -->
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('reports', page=1, per_page=per_page) }}" class="btn-link">&laquo; First</a>
+            <a href="{{ url_for('reports', page=page-1, per_page=per_page) }}" class="btn-link">&lsaquo; Previous</a>
+        {% else %}
+            <span class="btn-link disabled">&laquo; First</span>
+            <span class="btn-link disabled">&lsaquo; Previous</span>
+        {% endif %}
+        
+        <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
+        
+        {% if page < total_pages %}
+            <a href="{{ url_for('reports', page=page+1, per_page=per_page) }}" class="btn-link">Next &rsaquo;</a>
+            <a href="{{ url_for('reports', page=total_pages, per_page=per_page) }}" class="btn-link">Last &raquo;</a>
+        {% else %}
+            <span class="btn-link disabled">Next &rsaquo;</span>
+            <span class="btn-link disabled">Last &raquo;</span>
+        {% endif %}
+    </div>
+    
+    <!-- Page size selector -->
+    <div class="page-size-selector">
+        <form method="get" action="{{ url_for('reports') }}">
+            <label for="per_page">Items per page:</label>
+            <select id="per_page" name="per_page" onchange="this.form.submit()">
+                {% for size in [10, 20, 50, 100] %}
+                <option value="{{ size }}" {% if per_page == size %}selected{% endif %}>{{ size }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
 {% else %}
     <p>No reports found.</p>
 {% endif %}
