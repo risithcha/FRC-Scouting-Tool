@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Scout a Team</h2>
 
-<form method="get">
+<form method="get" action="{{ url_for('scout.scout') }}">
     <label for="team_number">Team Number:</label>
     <input type="text" id="team_number" name="team_number" required>
     <button type="submit">Look Up Team</button>

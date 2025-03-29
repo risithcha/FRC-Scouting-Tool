@@ -1,6 +1,8 @@
 import os
 import json
 import io
+import uuid
+import time
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -36,45 +38,63 @@ def upload_to_drive(file_content, file_name, folder_id=None):
         if folder_id:
             file_metadata['parents'] = [folder_id]
         
-        # Create a temporary file to upload, /tmp is being used cause... Render
-        try:
-            os.makedirs('/tmp', exist_ok=True)
-        except:
-            # If /tmp doesn't work, just use a local path
-            pass
-            
-        temp_path = os.path.join("/tmp", file_name)
+        # Create a unique temporary filename to avoid conflicts
+        unique_id = str(uuid.uuid4())[:8]
+        temp_path = f"temp_{unique_id}_{file_name}"
+        
+        # Create a temporary file to upload
         try:
             with open(temp_path, 'w') as f:
-                if isinstance(file_content, dict):
+                if isinstance(file_content, dict) or isinstance(file_content, list):
                     json.dump(file_content, f, indent=2)
                 else:
-                    f.write(file_content)
+                    f.write(str(file_content))
         except Exception as e:
             print(f"Error writing temp file: {str(e)}")
-            # Try other path if /tmp fails
-            temp_path = file_name
-            with open(temp_path, 'w') as f:
-                if isinstance(file_content, dict):
-                    json.dump(file_content, f, indent=2)
-                else:
-                    f.write(file_content)
+            return None
             
-        # Upload to Drive
-        media = MediaFileUpload(temp_path, mimetype='application/json')
-        file = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        ).execute()
-        
         try:
-            os.remove(temp_path)
-        except:
-            pass
-        
-        print(f"File uploaded to Drive with ID: {file.get('id')}")
-        return file.get('id')
+            # Upload to Drive
+            media = MediaFileUpload(temp_path, mimetype='application/json')
+            
+            # Check if file already exists
+            existing_file = find_file_by_name(file_name, folder_id)
+            
+            if existing_file:
+                # Update existing file
+                file = service.files().update(
+                    fileId=existing_file['id'],
+                    media_body=media).execute()
+                file_id = existing_file['id']
+            else:
+                # Create new file
+                file = service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id').execute()
+                file_id = file.get('id')
+            
+            print(f"File uploaded to Drive with ID: {file_id}")
+            return file_id
+            
+        finally:
+            # Always try to clean up the temp file with retry mechanism
+            for attempt in range(5):  # Try up to 5 times
+                try:
+                    if os.path.exists(temp_path):
+                        # Close any potential file handles
+                        media._fd.close()
+                        os.close(os.open(temp_path, os.O_RDONLY))
+                        # Remove the file
+                        os.remove(temp_path)
+                    break  # If successful, exit the retry loop
+                except Exception as e:
+                    print(f"Error removing temp file (attempt {attempt+1}): {str(e)}")
+                    time.sleep(0.5)  # Wait half a second before trying again
+            
+            # If we still couldn't delete it after all attempts, just log it
+            if os.path.exists(temp_path):
+                print(f"Warning: Could not remove temporary file {temp_path}")
     
     except Exception as e:
         print(f"Error uploading to Drive: {str(e)}")

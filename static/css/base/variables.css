@@ -1,0 +1,15 @@
+:root {
+    --blue: #0a3994;     
+    --dark-blue: #07286d;          
+    --bg-white: #f4f4f4;
+    --text: #333;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --radius: 4px;
+    
+    /* Add more semantic variables */
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --light-gray: #f7f7f7;
+}

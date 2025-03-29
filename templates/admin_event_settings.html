@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Admin - Event Settings</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-info">{{ message }}</div>
+{% endfor %}
+
+<form method="post" action="{{ url_for('admin.event_settings') }}">
+    <div class="admin-section">
+        <h3>Active Events</h3>
+        <p>These events will be visible in the match planner and event selectors throughout the app.</p>
+        
+        <div class="events-selector">
+            <div class="event-list">
+                {% for event in all_events %}
+                <div class="event-item">
+                    <input type="checkbox" id="event_{{ event.key }}" name="active_events" value="{{ event.key }}"
+                           {% if event.key in site_settings.active_events %}checked{% endif %}>
+                    <label for="event_{{ event.key }}">
+                        {{ event.name }} ({{ event.start_date }})
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h3>Default Event</h3>
+        <p>This event will be automatically selected for all users who haven't set their own preference.</p>
+        
+        <div class="form-group">
+            <select name="default_event" id="default_event" required>
+                {% for event in all_events %}
+                <option value="{{ event.key }}" {% if event.key == site_settings.default_event %}selected{% endif %}>
+                    {{ event.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h3>System Notice</h3>
+        <p>This message will appear at the top of all pages (leave blank for no message).</p>
+        
+        <div class="form-group">
+            <textarea name="system_notice" id="system_notice" rows="3">{{ site_settings.system_notice }}</textarea>
+        </div>
+    </div>
+    
+    <div class="admin-actions">
+        <button type="submit" class="btn">Save Settings</button>
+    </div>
+</form>
+{% endblock %}

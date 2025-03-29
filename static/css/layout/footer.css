@@ -1,0 +1,24 @@
+footer {
+    text-align: center;
+    padding: 8px 0;
+    background-color: var(--blue);
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.footer-credits {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.footer-credits a {
+    color: #c8d5ff;
+    text-decoration: underline;
+}
+
+.footer-credits a:hover {
+    color: white;
+}

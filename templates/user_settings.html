@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>User Settings</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-info">{{ message }}</div>
+{% endfor %}
+
+<form method="post" action="{{ url_for('auth.user_settings') }}">
+    <div class="scout-section">
+        <h3>Scouting Preferences</h3>
+        
+        <div class="form-group">
+            <label for="default_event">Default Event:</label>
+            <select id="default_event" name="default_event">
+                <option value="">No default event</option>
+                {% for event in events %}
+                <option value="{{ event.key }}" {% if settings.default_event == event.key %}selected{% endif %}>{{ event.name }}</option>
+                {% endfor %}
+            </select>
+            <small>This event will be pre-selected when scouting</small>
+        </div>
+    </div>
+
+    <button type="submit" class="btn">Save Settings</button>
+</form>
+{% endblock %}

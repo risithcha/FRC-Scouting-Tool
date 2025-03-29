@@ -1,0 +1,25 @@
+.cache-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.cache-status.active {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.cache-status.inactive {
+    background-color: #ffcdd2;
+    color: #c62828;
+}
+
+.cache-stats .data-table {
+    width: 100%;
+}
+
+.cache-stats .btn-small {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}

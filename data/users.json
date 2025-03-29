@@ -1,0 +1,26 @@
+{
+  "Tester": {
+    "password_hash": "scrypt:32768:8:1$Ql5IlymJNsEL7LNL$74944ce829487226704b2adf3c424b51e019a3c7b52c02214d08d8c7eedadcefce6ca5d9db8b32b97171bfdbbf6da285645a426e5d5f0f3b271c39a42759323b",
+    "is_admin": false,
+    "created_at": "2025-03-27 13:52:39",
+    "settings": {
+      "default_event": "2025wabon"
+    }
+  },
+  "EISHANnyc": {
+    "password_hash": "scrypt:32768:8:1$KksdDEwS9wCEdpEP$1c16d0c05056943062a99eac6e4d2912480b2016b951733348baea7cb6a63f951c81aa1c3f1711000724c42eb3bfc5ada88eef7b144aa66e6eae6a4bc9940b95",
+    "is_admin": false,
+    "created_at": "2025-03-27 15:13:07",
+    "settings": {
+      "default_event": ""
+    }
+  },
+  "skibidimaster6000": {
+    "password_hash": "scrypt:32768:8:1$BjLL38c6qKH6GMaW$57eacca9735f8b5e871f3571fa6e633726251873e7a435a962b67eb2235c1317dbd8c35f57aea40ea92cc97c252e2ed887fd2ba44c4186d44275faa3aa732fc6",
+    "is_admin": true,
+    "created_at": "2025-03-28 14:09:13",
+    "settings": {
+      "default_event": null
+    }
+  }
+}

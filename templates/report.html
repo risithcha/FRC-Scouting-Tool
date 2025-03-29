@@ -33,23 +33,23 @@
         <table class="data-table">
             <tr>
                 <td>L4 (Branch):</td>
-                <td>{{ report.autonomous.scoring.l4_count }}</td>
+                <td>{{ report.autonomous.scoring.l4_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L3 (Branch):</td>
-                <td>{{ report.autonomous.scoring.l3_count }}</td>
+                <td>{{ report.autonomous.scoring.l3_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L2 (Branch):</td>
-                <td>{{ report.autonomous.scoring.l2_count }}</td>
+                <td>{{ report.autonomous.scoring.l2_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L1 (Trough):</td>
-                <td>{{ report.autonomous.scoring.l1_count }}</td>
+                <td>{{ report.autonomous.scoring.l1_trough_successful }}</td>
             </tr>
             <tr>
                 <td>Net (Source):</td>
-                <td>{{ report.autonomous.scoring.net_count }}</td>
+                <td>{{ report.autonomous.scoring.net_successful }}</td>
             </tr>
         </table>
         
@@ -87,23 +87,23 @@
         <table class="data-table">
             <tr>
                 <td>L4 (Branch):</td>
-                <td>{{ report.teleop.scoring.l4_count }}</td>
+                <td>{{ report.teleop.scoring.l4_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L3 (Branch):</td>
-                <td>{{ report.teleop.scoring.l3_count }}</td>
+                <td>{{ report.teleop.scoring.l3_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L2 (Branch):</td>
-                <td>{{ report.teleop.scoring.l2_count }}</td>
+                <td>{{ report.teleop.scoring.l2_branch_successful }}</td>
             </tr>
             <tr>
                 <td>L1 (Trough):</td>
-                <td>{{ report.teleop.scoring.l1_count }}</td>
+                <td>{{ report.teleop.scoring.l1_trough_successful }}</td>
             </tr>
             <tr>
                 <td>Net (Source):</td>
-                <td>{{ report.teleop.scoring.net_count }}</td>
+                <td>{{ report.teleop.scoring.net_successful }}</td>
             </tr>
         </table>
         
@@ -137,6 +137,6 @@
     </div>
     {% endif %}
 
-    <p><a href="/reports"><i class="fas fa-arrow-left"></i> Back to All Reports</a></p>
+    <p><a href="{{ url_for('reports.view_reports') }}"><i class="fas fa-arrow-left"></i> Back to All Reports</a></p>
 </div>
 {% endblock %}

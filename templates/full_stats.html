@@ -22,22 +22,22 @@
         <tbody>
             {% for team in teams %}
             <tr data-team="{{ team.team_number }}">
-                <td class="rank-cell">{{ team.rank }}</td>
-                <td class="team-cell">
+                <td data-label="Rank" class="rank-cell">{{ team.rank }}</td>
+                <td data-label="Team" class="team-cell">
                     <div class="team-number">{{ team.team_number }}</div>
                     <div class="team-name">{{ team.team_name }}</div>
                 </td>
-                <td>{{ team.record }}</td>
-                <td>{{ team.reports_count }}</td>
-                <td>{{ team.stats.percent_moved }}%</td>
+                <td data-label="Record">{{ team.record }}</td>
+                <td data-label="Games">{{ team.reports_count }}</td>
+                <td data-label="% Moved">{{ team.stats.percent_moved }}%</td>
                 
-                <td class="metrics-cell">
+                <td data-label="Auto Performance" class="metrics-cell">
                     <div><strong>Moved:</strong> {{ team.stats.auto.percent_moved }}%</div>
                     <div><strong>Avg Corals:</strong> {{ team.stats.auto.avg_coral }}</div>
                     <div><strong>Avg Score:</strong> {{ team.stats.auto.avg_score }}</div>
                 </td>
                 
-                <td class="metrics-cell">
+                <td data-label="Teleop Performance" class="metrics-cell">
                     <div><strong>Avg Corals:</strong> {{ team.stats.teleop.avg_coral }}</div>
                     <div><strong>Avg Score:</strong> {{ team.stats.teleop.avg_score }}</div>
                     <div><strong>Avg Cycles:</strong> {{ team.stats.teleop.avg_cycles }}</div>
@@ -46,13 +46,13 @@
                     <div><strong>Avg Net:</strong> {{ team.stats.teleop.avg_net }}</div>
                 </td>
                 
-                <td class="metrics-cell">
+                <td data-label="Endgame" class="metrics-cell">
                     <div><strong>Park %:</strong> {{ team.stats.endgame.percent_park }}%</div>
                     <div><strong>Avg Points:</strong> {{ team.stats.endgame.avg_score }}</div>
                 </td>
                 
-                <td>
-                    <a href="{{ url_for('team_stats', team_number=team.team_number) }}" class="btn-link">Details</a>
+                <td data-label="Actions">
+                    <a href="{{ url_for('stats.team_stats', team_number=team.team_number) }}" class="btn-link">Details</a>
                 </td>
             </tr>
             {% endfor %}

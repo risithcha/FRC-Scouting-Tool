@@ -1,0 +1,73 @@
+.planner-container {
+    margin: 20px 0;
+}
+
+.event-selector {
+    margin: 20px 0;
+}
+
+.match-filter {
+    margin: 15px 0;
+}
+
+.planner-instructions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+}
+
+.status-info {
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+.alliances-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+
+.alliance {
+    flex: 1;
+    min-width: 300px;
+}
+
+.alliance-header {
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.alliance.red .alliance-header {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #d32f2f;
+}
+
+.alliance.blue .alliance-header {
+    background-color: rgba(0, 0, 255, 0.1);
+    color: #1976d2;
+}
+
+.team-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 50px 70px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.team-row.scouted {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-left: 4px solid #4caf50;
+}
+
+.team-row.unscouted {
+    border-left: 4px solid #ff9800;
+}

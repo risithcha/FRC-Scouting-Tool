@@ -1,0 +1,144 @@
+nav {
+    display: flex;
+    align-items: center;
+    background-color: var(--blue);
+    color: white;
+    padding: 0 20px;
+    box-shadow: var(--shadow);
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+    flex-wrap: wrap;
+}
+
+nav li {
+    margin: 5px 10px;
+}
+
+nav a {
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+}
+
+nav a i {
+    margin-right: 8px;
+}
+
+nav a:hover {
+    color: #ddd;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    flex: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0 10px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 10px;
+    display: inline-block;
+}
+
+.nav-links a:hover {
+    background-color: var(--dark-blue);
+    text-decoration: none;
+}
+
+.auth-nav {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.auth-nav a, .auth-nav span {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+}
+
+.auth-nav a:hover {
+    text-decoration: underline;
+}
+
+.hamburger-menu {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        padding: 0;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        display: none; 
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .nav-links li {
+        margin: 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-links a {
+        padding: 15px;
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .hamburger-menu {
+        display: block;
+        cursor: pointer;
+        padding: 10px 20px;
+        align-self: flex-end;
+    }
+    
+    .auth-nav {
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
+        display: none;
+    }
+    
+    .auth-nav.active {
+        display: flex;
+    }
+    
+    .auth-nav a, .auth-nav span {
+        width: 100%;
+        text-align: center;
+        padding: 12px 0;
+        margin: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .logo {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+    }
+}

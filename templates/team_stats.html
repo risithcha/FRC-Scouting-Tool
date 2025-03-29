@@ -117,7 +117,7 @@
         <ul class="report-list">
             {% for report in reports %}
             <li>
-                <a href="{{ url_for('view_report', filename=report.filename) }}">
+                <a href="{{ url_for('reports.view_report', filename=report.filename) }}">
                     Match {{ report.match_number }} - {{ report.timestamp }}
                 </a>
             </li>
@@ -125,6 +125,6 @@
         </ul>
     </div>
 
-    <p><a href="{{ url_for('full_stats') }}" class="button">Back to Teams</a></p>
+    <p><a href="{{ url_for('stats.full_stats') }}" class="button">Back to Teams</a></p>
 </div>
 {% endblock %}

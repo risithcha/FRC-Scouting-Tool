@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% from "macros/ui_components.html" import admin_card %}
+{% from "macros/table_components.html" import data_table %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<div class="admin-controls">
+    {{ admin_card(url_for('admin.event_settings'), "calendar-alt", "Event Settings", "Manage active events and default settings") }}
+    {{ admin_card(url_for('admin.user_management'), "users", "User Management", "View and manage user accounts") }}
+</div>
+
+
+<div class="admin-section">
+    <h3>Data Synchronization</h3>
+    
+    <div class="sync-stats">
+        <p><strong>Local Reports:</strong> {{ local_count }}</p>
+        {% if drive_count is defined %}
+        <p><strong>Google Drive Reports:</strong> {{ drive_count }}</p>
+        {% endif %}
+        <p><strong>Last Sync:</strong> {{ last_sync or 'Never' }}</p>
+    </div>
+    
+    <div class="sync-actions">
+        <form method="post" action="{{ url_for('admin.sync_from_drive') }}">
+            <button type="submit" class="btn">
+                <i class="fas fa-cloud-download-alt"></i> Sync from Google Drive
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h3>Cache Management</h3>
+    
+    <div class="cache-stats">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Cache Type</th>
+                    <th>Status</th>
+                    <th>Last Cleared</th>
+                    <th>Items Cached</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>General Cache</td>
+                    <td><span class="cache-status {% if cache_info.general.active %}active{% else %}inactive{% endif %}">
+                        {% if cache_info.general.active %}Active{% else %}Inactive{% endif %}
+                    </span></td>
+                    <td>{{ cache_info.general.last_cleared or 'Never' }}</td>
+                    <td>{{ cache_info.general.item_count }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.clear_cache') }}">
+                            <button type="submit" class="btn btn-small">
+                                <i class="fas fa-broom"></i> Clear
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Team Stats Cache</td>
+                    <td><span class="cache-status {% if cache_info.stats.active %}active{% else %}inactive{% endif %}">
+                        {% if cache_info.stats.active %}Active{% else %}Inactive{% endif %}
+                    </span></td>
+                    <td>{{ cache_info.stats.last_cleared or 'Never' }}</td>
+                    <td>{{ cache_info.stats.item_count }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.clear_stats_cache') }}">
+                            <button type="submit" class="btn btn-small">
+                                <i class="fas fa-broom"></i> Clear
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TBA API Cache</td>
+                    <td><span class="cache-status {% if cache_info.tba.active %}active{% else %}inactive{% endif %}">
+                        {% if cache_info.tba.active %}Active{% else %}Inactive{% endif %}
+                    </span></td>
+                    <td>{{ cache_info.tba.last_cleared or 'Never' }}</td>
+                    <td>{{ cache_info.tba.item_count }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.clear_tba_cache') }}">
+                            <button type="submit" class="btn btn-small">
+                                <i class="fas fa-broom"></i> Clear
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h3>Recent Activity</h3>
+    
+    {% call data_table(["Timestamp", "Action", "Details"]) %}
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.timestamp }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.details }}</td>
+        </tr>
+        {% endfor %}
+    {% endcall %}
+</div>
+
+<a href="{{ url_for('auth.admin_logout') }}" class="btn btn-secondary">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a>
+{% endblock %}

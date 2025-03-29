@@ -1,0 +1,83 @@
+.feature-link {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    background-color: #f0f4ff;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: all 0.2s;
+    border-top: 3px solid var(--blue);
+}
+
+.feature-link:hover, .feature-link:active {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(10, 57, 148, 0.2);
+}
+
+.feature-link i {
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.match-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: var(--blue);
+    color: white;
+}
+
+.match-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.admin-control-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.admin-control-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.admin-control-card i {
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 15px;
+}
+
+.admin-control-card h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.admin-control-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}

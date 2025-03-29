@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Admin - User Management</h2>
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-info">{{ message }}</div>
+{% endfor %}
+
+<div class="admin-section">
+    <h3>Registered Users</h3>
+    
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Admin Status</th>
+                <th>Default Event</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{% if user.is_admin %}Admin{% else %}User{% endif %}</td>
+                <td>{{ user.settings.default_event if user.settings and user.settings.default_event else 'Not set' }}</td>
+                <td>{{ user.created_at|truncate(10, true, '') if user.created_at else 'Unknown' }}</td>
+                <td>
+                    <div class="action-buttons">
+                        {% if user.username == env_admin_username %}
+                            <span class="text-muted">System Admin</span>
+                        {% elif user.is_admin %}
+                            <form method="post" action="{{ url_for('admin.toggle_admin_status', username=user.username) }}">
+                                <input type="hidden" name="action" value="demote">
+                                <button type="submit" class="btn btn-small btn-danger">Remove Admin</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ url_for('admin.toggle_admin_status', username=user.username) }}">
+                                <input type="hidden" name="action" value="promote">
+                                <button type="submit" class="btn btn-small">Make Admin</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

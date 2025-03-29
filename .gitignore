@@ -1,6 +1,17 @@
 # Environment variables and secrets
 .env
 *.env
+.env.*
+
+# Credentials and API keys
+*credentials*.json
+*creds*.json
+*key*.json
+*secret*.json
+
+# Temporary files
+temp_*_*.json
+temp_files/
 
 # Python
 __pycache__/
@@ -28,6 +39,12 @@ var/
 
 # Generated data
 data/reports/
+data/logs/activity_log.json
+data/cache_tracking.json
+
+# Static generated files
+static/gen/
+static/.webassets-cache/
 
 # IDE specific files
 .idea/

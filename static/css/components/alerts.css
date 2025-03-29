@@ -1,0 +1,32 @@
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.flash-messages li {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: var(--warning);
+    color: #664d03;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.ai-insights {
+    background-color: #f0f4ff;
+    border-left: 4px solid var(--blue);
+    padding: 15px;
+    margin-top: 20px;
+}

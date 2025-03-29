@@ -22,17 +22,16 @@
                 <td>{{ report.event }}</td>
                 <td>{{ report.scout_name }}</td>
                 <td>{{ report.timestamp }}</td>
-                <td><a href="/report/{{ report.filename }}">View</a></td>
+                <td><a href="{{ url_for('reports.view_report', filename=report.filename) }}">View</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     
-    <!-- Pagination! -->
     <div class="pagination">
         {% if page > 1 %}
-            <a href="{{ url_for('reports', page=1, per_page=per_page) }}" class="btn-link">&laquo; First</a>
-            <a href="{{ url_for('reports', page=page-1, per_page=per_page) }}" class="btn-link">&lsaquo; Previous</a>
+            <a href="{{ url_for('reports.view_reports', page=1, per_page=per_page) }}" class="btn-link">&laquo; First</a>
+            <a href="{{ url_for('reports.view_reports', page=page-1, per_page=per_page) }}" class="btn-link">&lsaquo; Previous</a>
         {% else %}
             <span class="btn-link disabled">&laquo; First</span>
             <span class="btn-link disabled">&lsaquo; Previous</span>
@@ -41,17 +40,16 @@
         <span class="pagination-info">Page {{ page }} of {{ total_pages }}</span>
         
         {% if page < total_pages %}
-            <a href="{{ url_for('reports', page=page+1, per_page=per_page) }}" class="btn-link">Next &rsaquo;</a>
-            <a href="{{ url_for('reports', page=total_pages, per_page=per_page) }}" class="btn-link">Last &raquo;</a>
+            <a href="{{ url_for('reports.view_reports', page=page+1, per_page=per_page) }}" class="btn-link">Next &rsaquo;</a>
+            <a href="{{ url_for('reports.view_reports', page=total_pages, per_page=per_page) }}" class="btn-link">Last &raquo;</a>
         {% else %}
             <span class="btn-link disabled">Next &rsaquo;</span>
             <span class="btn-link disabled">Last &raquo;</span>
         {% endif %}
     </div>
     
-    <!-- Page size selector -->
     <div class="page-size-selector">
-        <form method="get" action="{{ url_for('reports') }}">
+        <form method="get" action="{{ url_for('reports.view_reports') }}">
             <label for="per_page">Items per page:</label>
             <select id="per_page" name="per_page" onchange="this.form.submit()">
                 {% for size in [10, 20, 50, 100] %}

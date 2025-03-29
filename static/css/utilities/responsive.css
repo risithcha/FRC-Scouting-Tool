@@ -1,0 +1,115 @@
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.6rem;
+    }
+    
+    main {
+        width: 100%;
+        border-radius: 0;
+        padding: 15px 10px;
+        margin: 10px 0;
+    }
+    
+    nav ul {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    nav li {
+        margin: 5px 3px;
+    }
+    
+    nav a {
+        padding: 10px;
+    }
+    
+    nav a i {
+        margin-right: 5px;
+    }
+    
+    .feature-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .feature-link {
+        min-height: 130px;
+        padding: 15px;
+    }
+    
+    th, td {
+        padding: 10px;
+    }
+    
+    input, select, button, .btn, a.btn {
+        min-height: 44px; 
+    }
+    
+    .option-buttons {
+        flex-direction: column;
+        width: 120px;
+    }
+
+    .option-btn {
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    body {
+        padding-bottom: 80px;
+    }
+    
+    .feature-links, .admin-controls {
+        flex-direction: column;
+    }
+    
+    .alliances-container {
+        flex-direction: column;
+    }
+    
+    .team-row {
+        grid-template-columns: 50px 1fr 40px 60px;
+        gap: 5px;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pagination .btn-link {
+        padding: 12px 15px;
+    }
+    
+    footer {
+        font-size: 0.9rem;
+    }
+    
+    .system-notice {
+        padding: 12px 5px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+    
+    h2 {
+        font-size: 1.4rem;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+    }
+    
+    .logo a {
+        font-size: 1.1rem;
+    }
+}

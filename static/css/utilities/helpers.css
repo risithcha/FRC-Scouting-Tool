@@ -1,0 +1,47 @@
+.awards-list {
+    list-style: none;
+    padding: 0;
+}
+
+.awards-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.award-year {
+    font-weight: bold;
+    margin-right: 10px;
+    color: var(--blue);
+}
+
+.award-name {
+    font-weight: bold;
+}
+
+.award-event {
+    font-style: italic;
+    color: #666;
+    margin-left: 10px;
+}
+
+.team-number {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.team-name {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scouted-icon {
+    color: #4caf50;
+    font-size: 1.2rem;
+}
+
+.unscouted-icon {
+    color: #ff9800;
+    font-size: 1.2rem;
+}

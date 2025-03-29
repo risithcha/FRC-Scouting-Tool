@@ -1,0 +1,84 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+thead {
+    background-color: var(--blue);
+    color: white;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+    background-color: #f0f4ff;
+}
+
+.history-table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.history-table {
+    width: 100%;
+    min-width: 600px;
+}
+
+.history-table th {
+    background-color: var(--blue);
+    color: white;
+    padding: 8px;
+    text-align: left;
+}
+
+.history-table td {
+    padding: 6px 8px;
+}
+
+.history-table tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .mobile-cards tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: var(--radius);
+        padding: 10px;
+    }
+    
+    .mobile-cards td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 6px;
+        text-align: right;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .mobile-cards td:last-child {
+        border-bottom: none;
+    }
+    
+    .mobile-cards td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .mobile-cards thead {
+        display: none;
+    }
+}

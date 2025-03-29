@@ -1,0 +1,65 @@
+button, .btn {
+    background-color: var(--blue);
+    color: white;
+    border: none;
+    padding: 12px 15px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    text-align: center;
+    min-width: 80px;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button:hover, .btn:hover {
+    background-color: var(--dark-blue);
+}
+
+.btn-link {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: var(--blue);
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-link:hover, .btn-link:active {
+    background-color: var(--dark-blue);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    margin-top: 15px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-secondary i {
+    margin-right: 5px;
+}
+
+.submit-button {
+    background-color: var(--success);
+    color: white;
+    font-weight: bold;
+    padding: 15px;
+    font-size: 1.1rem;
+    margin-top: 20px;
+}
+
+.submit-button:hover {
+    background-color: #218838;
+}

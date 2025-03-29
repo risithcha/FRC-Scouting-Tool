@@ -1,42 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FRC Scouting Tool</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    {% assets "css_all" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+    {% from "macros/ui_components.html" import flash_messages, alert %}
+    {% from "macros/form_components.html" import form_field, form_row %}
+    {% from "macros/table_components.html" import data_table, pagination %}
+    
+    {% if system_notice %}
+    <div class="system-notice">
+        <i class="fas fa-bullhorn"></i> {{ system_notice }}
+    </div>
+    {% endif %}
+    
     <header>
-        <h1>FRC Scouting Tool</h1>
         <nav>
-            <ul>
-                <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="/scout"><i class="fas fa-clipboard-list"></i> Scout Team</a></li>
-                <!--I commented out this code because attempting to view it as it is right now could cause the server to crash-->
-                <!--<li><a href="/reports"><i class="fas fa-file-alt"></i> View Reports</a></li>-->
-                <!--<li><a href="/full_stats"><i class="fas fa-chart-bar"></i> Full Stats</a></li>-->
+            <div class="logo">
+                <a href="{{ url_for('main.index') }}">FRC Scouting Tool</a>
+                <div class="hamburger-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="{{ url_for('scout.scout_team') }}"><i class="fas fa-clipboard"></i> Scout</a></li>
+                <li><a href="{{ url_for('reports.view_reports') }}"><i class="fas fa-file-alt"></i> View Reports</a></li>
+                <li><a href="{{ url_for('stats.full_stats') }}"><i class="fas fa-chart-bar"></i> Full Stats</a></li>
+                <li><a href="{{ url_for('planner.match_planner') }}"><i class="fas fa-tasks"></i> Match Planner</a></li>
             </ul>
+            
+            <div class="auth-nav">
+                {% if session.get('username') %}
+                    <span>Welcome, {{ session.get('username') }}!</span>
+                    {% if session.get('is_admin') %}
+                        <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-cog"></i> Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.user_settings') }}"><i class="fas fa-user-cog"></i> Settings</a>
+                    <a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="{{ url_for('auth.register') }}"><i class="fas fa-user-plus"></i> Register</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     
     <main>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class="flash-messages">
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+        {{ flash_messages() }}
         
         {% block content %}{% endblock %}
     </main>
     
     <footer>
-        <p>FRC Scouting Tool - Beta Version</p>
+        <div class="footer-credits">
+            <span>Using: <a href="https://www.thebluealliance.com/apidocs" target="_blank">The Blue Alliance API</a></span> |
+            <span>Icons by <a href="https://fontawesome.com/license" target="_blank">Font Awesome</a></span>
+        </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const navLinks = document.querySelector('.nav-links');
+            const authNav = document.querySelector('.auth-nav');
+            
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                authNav.classList.toggle('active');
+                
+                const icon = hamburger.querySelector('i');
+                if (icon.classList.contains('fa-bars')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

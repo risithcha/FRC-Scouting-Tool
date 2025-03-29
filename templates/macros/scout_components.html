@@ -1,0 +1,98 @@
+{# Import necessary macros from form_components.html #}
+{% from "macros/form_components.html" import form_field, textarea, yes_no_option, form_section, form_row, half_form_group, submit_button, undo_button %}
+
+{# Counter row with missed/scored options #}
+{% macro counter_row(label, name_prefix) %}
+<div class="counter-row">
+    <div class="counter-label">{{ label }}</div>
+    <div class="counter-container">
+        <div class="counter-group">
+            <div class="counter-type missed">Missed</div>
+            <div class="counter">
+                <button type="button" class="counter-btn counter-minus">M</button>
+                <input type="number" name="{{ name_prefix }}_missed" min="0" value="0" class="counter-input" readonly>
+            </div>
+        </div>
+        <div class="counter-group">
+            <div class="counter-type scored">Scored</div>
+            <div class="counter">
+                <button type="button" class="counter-btn counter-plus">S</button>
+                <input type="number" name="{{ name_prefix }}_successful" min="0" value="0" class="counter-input" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# Simple counter row with just a number #}
+{% macro simple_counter_row(label, name) %}
+<div class="counter-row">
+    <div class="counter-label">{{ label }}</div>
+    <div class="counter">
+        <input type="number" name="{{ name }}" min="0" value="0" class="counter-input" readonly>
+    </div>
+</div>
+{% endmacro %}
+
+{# Auto scoring section #}
+{% macro auto_scoring_section() %}
+<div class="form-group">
+    <h4>Scoring</h4>
+    {{ counter_row("L4 Branch", "auto_l4_branch") }}
+    {{ counter_row("L3 Branch", "auto_l3_branch") }}
+    {{ counter_row("L2 Branch", "auto_l2_branch") }}
+    {{ counter_row("L1 Trough", "auto_l1_trough") }}
+    {{ counter_row("Net", "auto_net") }}
+</div>
+{% endmacro %}
+
+{# Teleop scoring section #}
+{% macro teleop_scoring_section() %}
+<div class="form-group">
+    <h4>Scoring</h4>
+    {{ counter_row("L4 Branch", "teleop_l4_branch") }}
+    {{ counter_row("L3 Branch", "teleop_l3_branch") }}
+    {{ counter_row("L2 Branch", "teleop_l2_branch") }}
+    {{ counter_row("L1 Trough", "teleop_l1_trough") }}
+    {{ counter_row("Net", "teleop_net") }}
+</div>
+{% endmacro %}
+
+{# Teleop cycles section #}
+{% macro teleop_cycles_section() %}
+<div class="form-group">
+    {{ simple_counter_row("Total Cycles", "teleop_cycles") }}
+    {{ simple_counter_row("Successful Cycles", "teleop_successful_cycles") }}
+</div>
+{% endmacro %}
+
+{# Autonomous section #}
+{% macro autonomous_section() %}
+{% call form_section("Autonomous") %}
+    {{ yes_no_option("auto_move", "Robot moved?") }}
+    {{ auto_scoring_section() }}
+    {{ undo_button() }}
+    {{ textarea("auto_notes", "Notes", 2, "Auto period observations...") }}
+{% endcall %}
+{% endmacro %}
+
+{# Teleop section #}
+{% macro teleop_section() %}
+{% call form_section("Teleop") %}
+    {{ teleop_scoring_section() }}
+    {{ undo_button() }}
+    {{ teleop_cycles_section() }}
+    {{ yes_no_option("teleop_processor", "Used Processor") }}
+    {{ textarea("teleop_notes", "Notes", 2, "Teleop period observations...") }}
+{% endcall %}
+{% endmacro %}
+
+{# Endgame section #}
+{% macro endgame_section() %}
+{% call form_section("Endgame") %}
+    {{ yes_no_option("endgame_park", "Park") }}
+    {{ yes_no_option("endgame_deep_climb", "Deep Climb") }}
+    {{ yes_no_option("endgame_shallow_climb", "Shallow Climb") }}
+    {{ textarea("endgame_notes", "Notes", 2, "Endgame observations...") }}
+{% endcall %}
+{% endmacro %}

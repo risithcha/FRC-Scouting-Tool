@@ -1,0 +1,35 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pagination .btn-link {
+    padding: 8px 12px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination .btn-link.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-info {
+    margin: 0 10px;
+}
+
+.page-size-selector {
+    text-align: right;
+    margin: 10px 0 20px;
+}
+
+.page-size-selector select {
+    margin-left: 5px;
+    padding: 5px;
+    width: auto;
+}

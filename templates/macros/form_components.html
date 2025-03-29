@@ -1,0 +1,85 @@
+{# Basic form field #}
+{% macro form_field(name, label, type="text", value="", placeholder="", required=false, readonly=false, min=none, max=none) %}
+<div class="form-group">
+    <label for="{{ name }}">{{ label }}:</label>
+    <input type="{{ type }}" 
+           id="{{ name }}" 
+           name="{{ name }}" 
+           value="{{ value }}" 
+           placeholder="{{ placeholder }}"
+           {% if required %}required{% endif %}
+           {% if readonly %}readonly{% endif %}
+           {% if min is not none %}min="{{ min }}"{% endif %}
+           {% if max is not none %}max="{{ max }}"{% endif %}>
+</div>
+{% endmacro %}
+
+{# Text area #}
+{% macro textarea(name, label, rows=3, placeholder="", value="") %}
+<div class="form-group">
+    <label for="{{ name }}">{{ label }}:</label>
+    <textarea id="{{ name }}" name="{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value }}</textarea>
+</div>
+{% endmacro %}
+
+{# Yes/No option row #}
+{% macro yes_no_option(name, label, required=true) %}
+<div class="option-row">
+    <div class="option-label">{{ label }}</div>
+    <div class="option-buttons">
+        <label class="option-btn">
+            <input type="radio" name="{{ name }}" value="yes" {% if required %}required{% endif %}>
+            <span>Yes</span>
+        </label>
+        <label class="option-btn">
+            <input type="radio" name="{{ name }}" value="no">
+            <span>No</span>
+        </label>
+    </div>
+</div>
+{% endmacro %}
+
+{# Form section #}
+{% macro form_section(title) %}
+<div class="scout-section">
+    <h3>{{ title }}</h3>
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+{# Form row for two half-width fields #}
+{% macro form_row() %}
+<div class="form-row">
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+{# Half-width form group #}
+{% macro half_form_group(name, label, type="text", value="", placeholder="", required=false, autofocus=false, min=none, max=none) %}
+<div class="form-group half-width">
+    <label for="{{ name }}">{{ label }}</label>
+    <input type="{{ type }}" 
+           id="{{ name }}" 
+           name="{{ name }}" 
+           value="{{ value }}" 
+           placeholder="{{ placeholder }}" 
+           {% if required %}required{% endif %} 
+           {% if autofocus %}autofocus{% endif %}
+           {% if min is not none %}min="{{ min }}"{% endif %}
+           {% if max is not none %}max="{{ max }}"{% endif %}>
+</div>
+{% endmacro %}
+
+{# Form submit button #}
+{% macro submit_button(text="Submit") %}
+<button type="submit" class="submit-button">{{ text }}</button>
+{% endmacro %}
+
+{# Undo button #}
+{% macro undo_button() %}
+<div class="form-group">
+    <button type="button" id="undoButton" class="btn btn-secondary">
+        <i class="fas fa-undo"></i> Undo Last Action
+    </button>
+</div>
+{% endmacro %}

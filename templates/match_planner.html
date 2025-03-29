@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% from "macros/ui_components.html" import match_card %}
+
+{% block content %}
+<h2>Match Planner</h2>
+<h3>{{ event_name }}</h3>
+
+<div class="event-selector">
+    <form action="{{ url_for('planner.match_planner') }}" method="get" id="event-form">
+        <label for="event-select">Event:</label>
+        <select id="event-select" onchange="document.location.href=`{{ url_for('planner.match_planner_event', event_key='') }}${this.value}`;">
+            {% for event in events %}
+            <option value="{{ event.key }}" {% if event.key == event_key %}selected{% endif %}>{{ event.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<div class="match-filter">
+    <label for="filter-type">Filter:</label>
+    <select id="filter-type" onchange="filterMatches()">
+        <option value="all">All Matches</option>
+        <option value="upcoming">Upcoming Matches</option>
+        <option value="unscouted">Unscouted Teams</option>
+    </select>
+</div>
+
+<div class="planner-instructions">
+    <div class="status-info">
+        <i class="fas fa-check-circle scouted-icon"></i> = Scouted
+    </div>
+    <div class="status-info">
+        <i class="fas fa-exclamation-circle unscouted-icon"></i> = Not Scouted
+    </div>
+</div>
+
+<div class="planner-container">
+    {% for match in planner_data %}
+        {{ match_card(match, current_time) }}
+    {% endfor %}
+</div>
+
+<script>
+    function updateTimes() {
+        const now = Math.floor(Date.now() / 1000);
+        document.querySelectorAll('.match-time').forEach(el => {
+            const timestamp = parseInt(el.getAttribute('data-timestamp'));
+            if (!timestamp) {
+                el.textContent = 'TBD';
+                return;
+            }
+            
+            const diff = timestamp - now;
+            
+            if (diff <= 0) {
+                el.textContent = 'Live Now';
+                el.classList.add('starting-now');
+            } else if (diff < 3600) {
+                const minutes = Math.floor(diff / 60);
+                el.textContent = `In ${minutes}m`;
+                if (minutes < 15) {
+                    el.classList.add('starting-soon');
+                }
+            } else if (diff < 86400) {
+                const hours = Math.floor(diff / 3600);
+                const minutes = Math.floor((diff % 3600) / 60);
+                el.textContent = `In ${hours}h ${minutes}m`;
+            } else {
+                const days = Math.floor(diff / 86400);
+                el.textContent = `In ${days} day${days !== 1 ? 's' : ''}`;
+            }
+        });
+    }
+    
+    function filterMatches() {
+        const filterType = document.getElementById('filter-type').value;
+        const now = Math.floor(Date.now() / 1000);
+        
+        document.querySelectorAll('.match-card').forEach(card => {
+            const timestamp = parseInt(card.getAttribute('data-timestamp'));
+            const unscouted = card.querySelectorAll('.team-row[data-scouted="false"]').length > 0;
+            
+            let show = true;
+            
+            if (filterType === 'upcoming' && timestamp < now) {
+                show = false;
+            } else if (filterType === 'unscouted' && !unscouted) {
+                show = false;
+            }
+            
+            card.style.display = show ? 'block' : 'none';
+        });
+    }
+    
+    // Update times on load and every minute
+    updateTimes();
+    setInterval(updateTimes, 60000);
+    
+    // Set default filter to upcoming matches
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('filter-type').value = 'upcoming';
+        filterMatches();
+    });
+</script>
+{% endblock %}

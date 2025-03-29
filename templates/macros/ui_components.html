@@ -1,0 +1,98 @@
+{# Flash messages #}
+{% macro flash_messages() %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+{% endmacro %}
+
+{# Feature link card #}
+{% macro feature_link(url, icon, title, description) %}
+<a href="{{ url }}" class="feature-link">
+    <i class="fas fa-{{ icon }}"></i>
+    <h3>{{ title }}</h3>
+    <p>{{ description }}</p>
+</a>
+{% endmacro %}
+
+{# Admin card #}
+{% macro admin_card(url, icon, title, description) %}
+<a href="{{ url }}" class="admin-control-card">
+    <i class="fas fa-{{ icon }}"></i>
+    <h3>{{ title }}</h3>
+    <p>{{ description }}</p>
+</a>
+{% endmacro %}
+
+{# Alert box #}
+{% macro alert(type="info", message="") %}
+<div class="alert alert-{{ type }}">
+    {{ message }}
+</div>
+{% endmacro %}
+
+{# Match card for match planner #}
+{% macro match_card(match, current_time) %}
+<div class="match-card" data-timestamp="{{ match.time }}">
+    <div class="match-header">
+        <h4>{{ match.comp_level }} {{ match.match_number }}</h4>
+        <span class="match-time" data-timestamp="{{ match.time }}" data-current="{{ current_time }}">
+            {% if match.time %}
+                {{ match.time|timestamp_to_time }}
+            {% else %}
+                TBD
+            {% endif %}
+        </span>
+    </div>
+    <div class="alliances-container">
+        {{ alliance_teams(match.alliances.red, "red") }}
+        {{ alliance_teams(match.alliances.blue, "blue") }}
+    </div>
+</div>
+{% endmacro %}
+
+{# Alliance teams for match planner #}
+{% macro alliance_teams(teams, color) %}
+<div class="alliance {{ color }}">
+    <div class="alliance-header">{{ color|capitalize }} Alliance</div>
+    {% for team in teams %}
+    <div class="team-row {% if team.match_scouted %}scouted{% else %}unscouted{% endif %}" 
+         data-scouted="{{ team.match_scouted|lower }}">
+        <div class="team-number">{{ team.team_number }}</div>
+        <div class="team-name">{{ team.team_name }}</div>
+        <div class="scouting-status">
+            {% if team.match_scouted %}
+            <i class="fas fa-check-circle scouted-icon" title="Scouted"></i>
+            {% else %}
+            <i class="fas fa-exclamation-circle unscouted-icon" title="Not Scouted"></i>
+            {% endif %}
+        </div>
+        <div class="actions">
+            {% if not team.match_scouted %}
+            <a href="{{ url_for('scout.scout', team_number=team.team_number) }}" class="btn-link">Scout</a>
+            {% else %}
+            <a href="{{ url_for('reports.view_reports') }}?team={{ team.team_number }}" class="btn-link">View</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{# Stats card for team statistics #}
+{% macro stats_card(title, value, unit="", icon="chart-line") %}
+<div class="stats-card">
+    <div class="stats-icon">
+        <i class="fas fa-{{ icon }}"></i>
+    </div>
+    <div class="stats-content">
+        <div class="stats-title">{{ title }}</div>
+        <div class="stats-value">{{ value }}{% if unit %}<span class="stats-unit">{{ unit }}</span>{% endif %}</div>
+    </div>
+</div>
+{% endmacro %}

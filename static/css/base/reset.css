@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-white);
+    color: var(--text);
+    padding-bottom: 60px;
+    overflow-x: hidden;
+}
+
+ul {
+    list-style: none;
+}

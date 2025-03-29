@@ -1,0 +1,144 @@
+form {
+    margin-bottom: 20px;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.form-group.half {
+    flex: 1;
+    min-width: 200px;
+    padding: 0 10px;
+}
+
+.option-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.option-label {
+    flex: 1;
+    font-weight: 500;
+}
+
+.option-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.option-btn {
+    display: inline-block;
+    position: relative;
+    margin-right: 8px;
+}
+
+.option-btn input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.option-btn span {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    min-width: 80px;
+}
+
+.option-btn input[type="radio"]:checked + span {
+    background-color: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+.option-btn input[value="yes"]:checked + span {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.option-btn input[value="no"]:checked + span {
+    background-color: var(--danger);
+    border-color: var(--danger);
+}
+
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea,
+    button,
+    .btn {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+        padding: 15px 12px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        margin: 0;
+    }
+    
+    .form-group.half {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .option-buttons {
+        flex-direction: row;
+        width: 100%;
+        gap: 5px;
+    }
+    
+    .option-btn {
+        flex: 1;
+        margin: 0;
+    }
+    
+    .option-btn span {
+        display: block;
+        width: 100%;
+        padding: 15px 10px;
+    }
+}
