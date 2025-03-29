@@ -87,3 +87,5 @@ def create_app(config_class=Config):
     register_template_filters(app)
     
     return app
+
+app = create_app()
