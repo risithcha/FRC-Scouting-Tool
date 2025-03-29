@@ -1,6 +1,7 @@
 flask
 werkzeug
 gunicorn
+flask-caching
 python-dotenv
 requests
 google-auth
