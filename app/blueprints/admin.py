@@ -8,6 +8,7 @@ from app.utils.logger import log_activity, get_recent_logs
 from app.utils.cache import cache
 from app.utils.stats_utils import invalidate_team_stats_cache
 from app.utils.cache_tracker import get_cache_info, update_cache_info
+from app.utils.background_tasks import task_manager
 import os
 import datetime
 
@@ -38,28 +39,39 @@ def dashboard():
         cache_info=cache_info
     )
 
+@admin_bp.route("/sync_status")
+@admin_required
+def sync_status():
+    # Check the status of background sync tasks
+    status = task_manager.get_task_status('sync_reports')
+    
+    if not status or status.get('status') == 'not_found':
+        flash("No recent sync task found")
+        return redirect(url_for("admin.dashboard"))
+    
+    return render_template(
+        "admin_sync_status.html", 
+        status=status,
+        is_running=status.get('status') == 'running'
+    )
+
 @admin_bp.route("/sync", methods=["POST"])
 @admin_required
 def sync_from_drive():
-    # Sync reports from Google Drive to local storage
-    reports_result = report_service.sync_reports_from_drive()
+    # Start background sync from Google Drive to local storage
+    # Start the sync in the background
+    result = task_manager.start_task(
+        'sync_reports', 
+        report_service.sync_reports_from_drive
+    )
     
-    # Also sync users
-    users_result = report_service.sync_users_from_drive()
-    
-    if users_result.get("status") == "success":
-        user_msg = f", {users_result['new_users']} new users added"
+    if result['status'] == 'already_running':
+        flash("A sync is already in progress. Please wait for it to complete.")
     else:
-        user_msg = f", user sync: {users_result['status']}"
+        flash("Sync started in the background. You can continue using the app while it runs.")
+        log_activity("Manual Sync", "Started background sync from Google Drive")
     
-    batches_info = ""
-    if "batches" in reports_result and reports_result["batches"] > 0:
-        batches_info = f" in {reports_result['batches']} batches"
-    
-    flash(f"Sync completed: {reports_result['synced']} files downloaded{batches_info}, {reports_result['failed']} failed{user_msg}")
-    log_activity("Manual Sync", f"Synced {reports_result['synced']} files{batches_info} and users from Google Drive to local storage")
-    
-    return redirect(url_for("admin.dashboard"))
+    return redirect(url_for("admin.sync_status"))
 
 @admin_bp.route("/event_settings", methods=["GET", "POST"])
 @admin_required

@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Sync Status</h2>
+
+<div class="admin-section">
+    <h3>Current Sync Operation</h3>
+    
+    <div class="sync-status">
+        <p><strong>Status:</strong> 
+            {% if status.status == 'running' %}
+                <span class="badge badge-primary">Running</span>
+            {% elif status.status == 'completed' %}
+                <span class="badge badge-success">Completed</span>
+            {% elif status.status == 'failed' %}
+                <span class="badge badge-danger">Failed</span>
+            {% endif %}
+        </p>
+        
+        <p><strong>Started:</strong> {{ status.start_time }}</p>
+        
+        {% if status.end_time %}
+        <p><strong>Finished:</strong> {{ status.end_time }}</p>
+        {% endif %}
+        
+        {% if status.result %}
+        <div class="sync-result">
+            <h4>Sync Results</h4>
+            <p><strong>Files Downloaded:</strong> {{ status.result.synced }}</p>
+            <p><strong>Failed Downloads:</strong> {{ status.result.failed }}</p>
+            <p><strong>Total Files on Drive:</strong> {{ status.result.total_drive }}</p>
+            <p><strong>Total Files Locally:</strong> {{ status.result.total_local }}</p>
+            <p><strong>Batches Processed:</strong> {{ status.result.batches }}</p>
+            
+            {% if status.result.users_result %}
+            <h4>User Sync Results</h4>
+            <p><strong>Status:</strong> {{ status.result.users_result.status }}</p>
+            {% if status.result.users_result.new_users is defined %}
+            <p><strong>New Users Added:</strong> {{ status.result.users_result.new_users }}</p>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if status.error %}
+        <div class="error-info">
+            <h4>Error</h4>
+            <pre>{{ status.error }}</pre>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if is_running %}
+    <div class="alert alert-info">
+        <p>The sync operation is running in the background. You can continue using the application.</p>
+        <p>This page will automatically refresh to show progress.</p>
+    </div>
+    
+    <script>
+        // Auto-refresh page every 10 seconds when sync is running
+        setTimeout(function() {
+            window.location.reload();
+        }, 10000);
+    </script>
+    {% endif %}
+    
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn">Return to Dashboard</a>
+        
+        {% if status.status != 'running' %}
+        <form method="post" action="{{ url_for('admin.sync_from_drive') }}" style="display: inline-block;">
+            <button type="submit" class="btn">Start New Sync</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
