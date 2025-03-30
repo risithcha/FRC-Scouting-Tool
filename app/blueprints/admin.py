@@ -42,10 +42,18 @@ def dashboard():
 @admin_required
 def sync_from_drive():
     # Sync reports from Google Drive to local storage
-    result = report_service.sync_reports_from_drive()
+    reports_result = report_service.sync_reports_from_drive()
     
-    flash(f"Sync completed: {result['synced']} files downloaded, {result['failed']} failed") #How exactly does this work?
-    log_activity("Manual Sync", f"Synced {result['synced']} files from Google Drive to local storage")
+    # Also sync users
+    users_result = report_service.sync_users_from_drive()
+    
+    if users_result.get("status") == "success":
+        user_msg = f", {users_result['new_users']} new users added"
+    else:
+        user_msg = f", user sync: {users_result['status']}"
+    
+    flash(f"Sync completed: {reports_result['synced']} files downloaded, {reports_result['failed']} failed{user_msg}")
+    log_activity("Manual Sync", f"Synced {reports_result['synced']} files and users from Google Drive to local storage")
     
     return redirect(url_for("admin.dashboard"))
 

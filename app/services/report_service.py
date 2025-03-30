@@ -130,5 +130,52 @@ class ReportService:
             "total_drive": len(drive_files),
             "total_local": len(local_files) + synced_count
         }
+    
+    @staticmethod
+    def sync_users_from_drive():
+        # Sync users from Google Drive
+        drive_folder_id = current_app.config["GOOGLE_DRIVE_FOLDER_ID"]
+        
+        # Find users file in Drive
+        file_info = find_file_by_name("users.json", drive_folder_id)
+        
+        if not file_info:
+            return {"status": "No users file found on Drive"}
+        
+        # Download users file
+        content = download_file_from_drive(file_info['id'])
+        if not content:
+            return {"status": "Failed to download users file"}
+        
+        try:
+            drive_users = json.loads(content)
+            
+            # Load current local users
+            local_path = os.path.join("data", "users.json")
+            local_users = {}
+            if os.path.exists(local_path):
+                with open(local_path, 'r') as f:
+                    local_users = json.load(f)
+            
+            local_usernames = {user["username"].lower() for user in local_users.get("users", [])}
+            new_users_count = 0
+            
+            for drive_user in drive_users.get("users", []):
+                if drive_user["username"].lower() not in local_usernames:
+                    local_users.setdefault("users", []).append(drive_user)
+                    new_users_count += 1
+            
+            # Save updated users file
+            if new_users_count > 0:
+                with open(local_path, 'w') as f:
+                    json.dump(local_users, f, indent=2)
+            
+            return {
+                "status": "success",
+                "new_users": new_users_count
+            }
+        
+        except Exception as e:
+            return {"status": f"Error: {str(e)}"}
 
 report_service = ReportService()
