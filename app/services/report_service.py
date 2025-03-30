@@ -193,7 +193,7 @@ class ReportService:
     
     @staticmethod
     def sync_users_from_drive():
-        """Sync users from Google Drive"""
+        # Sync users from Google Drive
         drive_folder_id = current_app.config["GOOGLE_DRIVE_FOLDER_ID"]
         
         print(f"Syncing users from Google Drive folder ID: {drive_folder_id}")
