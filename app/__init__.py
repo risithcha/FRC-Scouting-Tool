@@ -4,6 +4,7 @@ from app.config import Config
 import os
 from app.utils.cache import init_cache
 from app.utils.background_tasks import task_manager
+from app.services.user_service import user_manager
 
 def create_app(config_class=Config):
     # Create and configure the Flask app
@@ -61,9 +62,8 @@ def create_app(config_class=Config):
     os.makedirs(app.config["REPORTS_DIR"], exist_ok=True)
     os.makedirs(app.config["LOGS_DIR"], exist_ok=True)
     
-    # Import user_manager from app.services
-    from app.services.user_service import user_manager
-    app.user_manager = user_manager
+    # Initialize user manager with the app and ensure it has the drive folder ID
+    user_manager.init_app(app)
     
     # Register blueprints
     from app.blueprints.main import main_bp

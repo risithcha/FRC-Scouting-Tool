@@ -62,9 +62,15 @@ class UserManager:
         return self.users_cache
     
     def _save_users(self):
-        # Save users to Google Drive
-        if self.users_cache:
+        # Save users locally
+        self._save_local_users(self.users_cache)
+        
+        # Backup to Google Drive if configured
+        if self.drive_folder_id:
+            print(f"Saving users to Google Drive folder: {self.drive_folder_id}")
             upload_to_drive(self.users_cache, self.USERS_FILE, self.drive_folder_id)
+        else:
+            print("No Google Drive folder ID configured. Users not saved to Drive.")
     
     def get_user(self, username):
         # Get user by username

@@ -4,7 +4,8 @@ import datetime
 import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app
-from app.services.drive_service import upload_to_drive, download_file_from_drive, find_file_by_name
+# Fix the import to use the correct drive_integration module
+from drive_integration import upload_to_drive, download_file_from_drive, find_file_by_name
 from app.utils.logger import log_activity
 
 class UserManager:
@@ -79,7 +80,12 @@ class UserManager:
     def _save_drive_users(self, users_data):
         # Save users to Google Drive
         try:
-            upload_to_drive(users_data, "users.json", self.google_drive_folder_id)
+            # Make sure we're actually uploading the file to drive
+            result = upload_to_drive(users_data, "users.json", self.google_drive_folder_id)
+            if result:
+                print(f"User data uploaded to Drive with ID: {result}")
+            else:
+                print("Failed to upload user data to Drive")
         except Exception as e:
             print(f"Error saving users to Drive: {str(e)}")
     
