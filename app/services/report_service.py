@@ -1,5 +1,7 @@
 import os
 import json
+import time
+import math
 import datetime
 from flask import current_app
 from app.models.report import Report
@@ -93,7 +95,7 @@ class ReportService:
     
     @staticmethod
     def sync_reports_from_drive():
-        # Sync reports from Google Drive to local storage if they don't exist locally
+        """Sync reports from Google Drive to local storage in batches of 10"""
         reports_dir = current_app.config["REPORTS_DIR"]
         drive_folder_id = current_app.config["GOOGLE_DRIVE_FOLDER_ID"]
         
@@ -106,9 +108,22 @@ class ReportService:
         synced_count = 0
         failed_count = 0
         
-        # Download files that don't exist locally
-        for file in drive_files:
-            if file['name'] not in local_files and file['name'].endswith('.json'):
+        # Get files that need to be downloaded (don't exist locally)
+        files_to_download = [
+            file for file in drive_files 
+            if file['name'] not in local_files and file['name'].endswith('.json')
+        ]
+        
+        # Process in batches of 10
+        batch_size = 10
+        total_batches = math.ceil(len(files_to_download) / batch_size)
+        
+        for i in range(0, len(files_to_download), batch_size):
+            batch = files_to_download[i:i+batch_size]
+            current_batch = i // batch_size + 1
+            print(f"Processing batch {current_batch}/{total_batches} ({len(batch)} files)")
+            
+            for file in batch:
                 file_content = download_file_from_drive(file['id'])
                 if file_content:
                     local_path = os.path.join(reports_dir, file['name'])
@@ -119,6 +134,10 @@ class ReportService:
                     except Exception as e:
                         failed_count += 1
                         print(f"Error saving {file['name']} locally: {str(e)}")
+            
+            # Add a pause between batches to prevent overwhelming the server
+            if i + batch_size < len(files_to_download):
+                time.sleep(5)  # 5 second pause between batches
         
         # Save last sync time
         with open(os.path.join("data", "last_sync.txt"), 'w') as f:
@@ -128,7 +147,8 @@ class ReportService:
             "synced": synced_count,
             "failed": failed_count,
             "total_drive": len(drive_files),
-            "total_local": len(local_files) + synced_count
+            "total_local": len(local_files) + synced_count,
+            "batches": total_batches
         }
     
     @staticmethod

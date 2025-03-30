@@ -52,8 +52,12 @@ def sync_from_drive():
     else:
         user_msg = f", user sync: {users_result['status']}"
     
-    flash(f"Sync completed: {reports_result['synced']} files downloaded, {reports_result['failed']} failed{user_msg}")
-    log_activity("Manual Sync", f"Synced {reports_result['synced']} files and users from Google Drive to local storage")
+    batches_info = ""
+    if "batches" in reports_result and reports_result["batches"] > 0:
+        batches_info = f" in {reports_result['batches']} batches"
+    
+    flash(f"Sync completed: {reports_result['synced']} files downloaded{batches_info}, {reports_result['failed']} failed{user_msg}")
+    log_activity("Manual Sync", f"Synced {reports_result['synced']} files{batches_info} and users from Google Drive to local storage")
     
     return redirect(url_for("admin.dashboard"))
 
