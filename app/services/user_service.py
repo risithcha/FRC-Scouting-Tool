@@ -31,7 +31,7 @@ class UserManager:
         self.users = self._load_users()
     
     def _force_download_from_drive(self):
-        """Force download the users.json file from Google Drive at startup"""
+        # Force download the users.json file from Google Drive at startup
         if not self.google_drive_folder_id:
             print("No Google Drive folder ID configured. Skipping user download.")
             return False
@@ -64,7 +64,7 @@ class UserManager:
             return False
     
     def _load_users(self):
-        """Load users from local file"""
+        # Load users from local file
         if os.path.exists(self.users_file):
             try:
                 with open(self.users_file, 'r') as f:
@@ -81,7 +81,7 @@ class UserManager:
             return empty_users
     
     def _save_users(self):
-        """Save users locally and to Google Drive"""
+        # Save users locally and to Google Drive
         # Save users locally
         self._save_local_users(self.users)
         
@@ -93,14 +93,14 @@ class UserManager:
             print("No Google Drive folder ID configured. Users not saved to Drive.")
     
     def _save_local_users(self, users_data):
-        """Save users to local file"""
+        # Save users to local file
         # Make sure data directory exists
         os.makedirs(os.path.dirname(self.users_file), exist_ok=True)
         with open(self.users_file, 'w') as f:
             json.dump(users_data, f, indent=2)
     
     def _save_drive_users(self, users_data):
-        """Save users to Google Drive"""
+        # Save users to Google Drive
         try:
             result = upload_to_drive(users_data, "users.json", self.google_drive_folder_id)
             if result:
