@@ -3,6 +3,7 @@ from flask_assets import Environment, Bundle
 from app.config import Config
 import os
 from app.utils.cache import init_cache
+from app.utils.background_tasks import task_manager
 
 def create_app(config_class=Config):
     # Create and configure the Flask app
@@ -52,6 +53,9 @@ def create_app(config_class=Config):
     
     # Initialize cache
     init_cache(app)
+    
+    # Initialize task manager with the app
+    task_manager.init_app(app)
     
     # Create necessary directories
     os.makedirs(app.config["REPORTS_DIR"], exist_ok=True)

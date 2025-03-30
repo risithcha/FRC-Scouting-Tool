@@ -31,12 +31,16 @@ def dashboard():
     # Get cache info
     cache_info = get_cache_info()
     
+    # Get task status for the dashboard
+    sync_task_status = task_manager.get_task_status('sync_reports')
+    
     return render_template(
         "admin_dashboard.html",
         local_count=local_count,
         last_sync=last_sync,
         logs=logs,
-        cache_info=cache_info
+        cache_info=cache_info,
+        task_status=sync_task_status
     )
 
 @admin_bp.route("/sync_status")
@@ -59,7 +63,6 @@ def sync_status():
 @admin_required
 def sync_from_drive():
     # Start background sync from Google Drive to local storage
-    # Start the sync in the background
     result = task_manager.start_task(
         'sync_reports', 
         report_service.sync_reports_from_drive
@@ -117,7 +120,7 @@ def user_management():
     return render_template(
         "admin_user_management.html",
         users=users,
-        env_admin_username=current_app.config.get('ADMIN_USERNAME', '') #What's this for?
+        env_admin_username=current_app.config.get('ADMIN_USERNAME', '')
     )
 
 @admin_bp.route("/clear_cache", methods=["POST"])
@@ -178,6 +181,31 @@ def toggle_admin_status(username):
         log_activity("Admin Action", f"Removed admin status from {username}")
     else:
         flash("Invalid action")
+    
+    return redirect(url_for("admin.user_management"))
+
+@admin_bp.route("/delete_user/<username>", methods=["POST"])
+@admin_required
+def delete_user(username):
+    # Delete a user
+    # Only the root admin can delete users
+    if session.get('username') != current_app.config.get('ADMIN_USERNAME'):
+        flash("Only the system administrator can delete users")
+        return redirect(url_for("admin.user_management"))
+    
+    # Don't allow deleting the root admin
+    if username == current_app.config.get('ADMIN_USERNAME'):
+        flash("Cannot delete the system administrator account")
+        return redirect(url_for("admin.user_management"))
+    
+    # Delete the user
+    result = user_manager.delete_user(username)
+    
+    if result:
+        flash(f"User {username} has been deleted")
+        log_activity("Admin Action", f"Deleted user {username}")
+    else:
+        flash(f"Failed to delete user {username}")
     
     return redirect(url_for("admin.user_management"))
 
