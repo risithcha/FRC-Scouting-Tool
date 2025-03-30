@@ -100,26 +100,32 @@ def upload_to_drive(file_content, file_name, folder_id=None):
         print(f"Error uploading to Drive: {str(e)}")
         return None
 
-def get_all_files_from_drive(folder_id=None):
-    # Get all files from a Google Drive folder
+def get_all_files_from_drive(folder_id=None, page_size=100, page_token=None):
+    # Get files from a Google Drive folder with pagination
     try:
         service = get_drive_service()
         if not service:
-            return []
+            return {"files": [], "nextPageToken": None}
         
         query = f"'{folder_id}' in parents and mimeType='application/json'" if folder_id else "mimeType='application/json'"
         
+        # Use pagination to get files in smaller batches
         results = service.files().list(
             q=query,
             spaces='drive',
-            fields='files(id, name)'
+            fields='nextPageToken, files(id, name)',
+            pageSize=page_size,
+            pageToken=page_token
         ).execute()
         
-        return results.get('files', [])
+        return {
+            "files": results.get('files', []),
+            "nextPageToken": results.get('nextPageToken')
+        }
     
     except Exception as e:
         print(f"Error retrieving files from Drive: {str(e)}")
-        return []
+        return {"files": [], "nextPageToken": None}
 
 def download_file_from_drive(file_id):
     # Download a file from Google Drive by ID

@@ -95,49 +95,69 @@ class ReportService:
     
     @staticmethod
     def sync_reports_from_drive():
-        """Sync reports from Google Drive to local storage in batches of 10"""
+        # Sync reports from Google Drive in small batches to prevent timeouts
         reports_dir = current_app.config["REPORTS_DIR"]
         drive_folder_id = current_app.config["GOOGLE_DRIVE_FOLDER_ID"]
         
         # Get list of local files
         local_files = set(os.listdir(reports_dir))
         
-        # Get files from Google Drive
-        drive_files = get_all_files_from_drive(drive_folder_id)
-        
         synced_count = 0
         failed_count = 0
+        batch_count = 0
+        total_drive_files = 0
         
-        # Get files that need to be downloaded (don't exist locally)
-        files_to_download = [
-            file for file in drive_files 
-            if file['name'] not in local_files and file['name'].endswith('.json')
-        ]
+        # Use pagination to get files in smaller batches from Drive
+        next_page_token = None
         
-        # Process in batches of 10
-        batch_size = 10
-        total_batches = math.ceil(len(files_to_download) / batch_size)
-        
-        for i in range(0, len(files_to_download), batch_size):
-            batch = files_to_download[i:i+batch_size]
-            current_batch = i // batch_size + 1
-            print(f"Processing batch {current_batch}/{total_batches} ({len(batch)} files)")
+        while True:
+            batch_count += 1
+            print(f"Fetching file list batch #{batch_count} from Google Drive")
             
-            for file in batch:
-                file_content = download_file_from_drive(file['id'])
-                if file_content:
-                    local_path = os.path.join(reports_dir, file['name'])
-                    try:
-                        with open(local_path, 'w') as f:
-                            f.write(file_content)
-                        synced_count += 1
-                    except Exception as e:
-                        failed_count += 1
-                        print(f"Error saving {file['name']} locally: {str(e)}")
+            # Get a batch of files from Drive
+            result = get_all_files_from_drive(drive_folder_id, page_size=100, page_token=next_page_token)
+            drive_files_batch = result["files"]
+            next_page_token = result["nextPageToken"]
             
-            # Add a pause between batches to prevent overwhelming the server
-            if i + batch_size < len(files_to_download):
-                time.sleep(5)  # 5 second pause between batches
+            total_drive_files += len(drive_files_batch)
+            
+            # Filter files that need to be downloaded
+            files_to_download = [
+                file for file in drive_files_batch 
+                if file['name'] not in local_files and file['name'].endswith('.json')
+            ]
+            
+            # Process in smaller download batches of 10
+            download_batch_size = 10
+            download_batches = math.ceil(len(files_to_download) / download_batch_size)
+            
+            for i in range(0, len(files_to_download), download_batch_size):
+                download_batch = files_to_download[i:i+download_batch_size]
+                current_batch = i // download_batch_size + 1
+                print(f"Processing download batch {current_batch}/{download_batches} ({len(download_batch)} files)")
+                
+                for file in download_batch:
+                    file_content = download_file_from_drive(file['id'])
+                    if file_content:
+                        local_path = os.path.join(reports_dir, file['name'])
+                        try:
+                            with open(local_path, 'w') as f:
+                                f.write(file_content)
+                            synced_count += 1
+                        except Exception as e:
+                            failed_count += 1
+                            print(f"Error saving {file['name']} locally: {str(e)}")
+                
+                # Add a pause between download batches
+                if i + download_batch_size < len(files_to_download):
+                    time.sleep(1.5)  # 1.5 second pause between download batches
+            
+            # If no more pages, break the loop
+            if not next_page_token:
+                break
+                
+            # Pause between fetching file list batches
+            time.sleep(2)  # 2 second pause between file listing batches
         
         # Save last sync time
         with open(os.path.join("data", "last_sync.txt"), 'w') as f:
@@ -146,9 +166,9 @@ class ReportService:
         return {
             "synced": synced_count,
             "failed": failed_count,
-            "total_drive": len(drive_files),
+            "total_drive": total_drive_files,
             "total_local": len(local_files) + synced_count,
-            "batches": total_batches
+            "batches": batch_count
         }
     
     @staticmethod
