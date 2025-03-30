@@ -4,7 +4,7 @@ import datetime
 import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app
-# Fix the import to use the correct drive_integration module
+# Use the correct drive_integration import
 from drive_integration import upload_to_drive, download_file_from_drive, find_file_by_name
 from app.utils.logger import log_activity
 
@@ -14,80 +14,104 @@ class UserManager:
     def __init__(self, google_drive_folder_id=None):
         self.google_drive_folder_id = google_drive_folder_id
         self.users_file = os.path.join("data", "users.json")
-        self.users = self._load_users()
+        self.users = {}  # Initialize empty, will load in init_app
+        self.app = None
     
     def init_app(self, app):
         self.app = app
         # Set folder ID from config if not provided
         if not self.google_drive_folder_id and app.config.get("GOOGLE_DRIVE_FOLDER_ID"):
             self.google_drive_folder_id = app.config.get("GOOGLE_DRIVE_FOLDER_ID")
+        
+        # Force download from Drive on startup
+        print("Initializing user manager - forcing download from Google Drive")
+        self._force_download_from_drive()
+        
+        # Now load users (includes the just-downloaded file)
+        self.users = self._load_users()
+    
+    def _force_download_from_drive(self):
+        """Force download the users.json file from Google Drive at startup"""
+        if not self.google_drive_folder_id:
+            print("No Google Drive folder ID configured. Skipping user download.")
+            return False
+        
+        try:
+            # Find users file in Drive
+            file_info = find_file_by_name("users.json", self.google_drive_folder_id)
+            if not file_info:
+                print("No users.json found on Google Drive. Using local file only.")
+                return False
+            
+            # Download users file
+            content = download_file_from_drive(file_info['id'])
+            if not content:
+                print("Failed to download users.json from Google Drive.")
+                return False
+            
+            # Parse and save locally
+            try:
+                drive_users = json.loads(content)
+                self._save_local_users(drive_users)
+                print(f"Successfully downloaded users.json from Google Drive with {len(drive_users)} users.")
+                return True
+            except json.JSONDecodeError:
+                print("Failed to parse users.json from Google Drive - invalid JSON.")
+                return False
+                
+        except Exception as e:
+            print(f"Error downloading users from Drive: {str(e)}")
+            return False
     
     def _load_users(self):
-        # First try to load from local file
-        local_users = self._load_local_users()
-        
-        # Then check Google Drive if configured
-        if self.google_drive_folder_id:
-            drive_users = self._load_drive_users()
-            
-            # If we have both, merge them (local takes precedence for now)
-            if local_users and drive_users:
-                # TODO: Implement proper merging with timestamps
-                return local_users
-            elif drive_users:
-                # If we only have drive users, save them locally
-                self._save_local_users(drive_users)
-                return drive_users
-        
-        return local_users
-    
-    def _load_local_users(self):
-        # Load users from local file
+        """Load users from local file"""
         if os.path.exists(self.users_file):
             try:
                 with open(self.users_file, 'r') as f:
                     return json.load(f)
             except json.JSONDecodeError:
-                return {}
-        return {}
-    
-    def _load_drive_users(self):
-        # Load users from Google Drive
-        try:
-            file_info = find_file_by_name("users.json", self.google_drive_folder_id)
-            if file_info:
-                content = download_file_from_drive(file_info['id'])
-                if content:
-                    return json.loads(content)
-            return None
-        except Exception as e:
-            print(f"Error loading users from Drive: {str(e)}")
-            return None
+                print("Error loading users.json - invalid JSON. Creating empty users file.")
+                empty_users = {}
+                self._save_local_users(empty_users)
+                return empty_users
+        else:
+            print("No users.json file found. Creating empty users file.")
+            empty_users = {}
+            self._save_local_users(empty_users)
+            return empty_users
     
     def _save_users(self):
+        """Save users locally and to Google Drive"""
         # Save users locally
         self._save_local_users(self.users)
         
         # Backup to Google Drive if configured
         if self.google_drive_folder_id:
+            print(f"Saving users to Google Drive folder: {self.google_drive_folder_id}")
             self._save_drive_users(self.users)
+        else:
+            print("No Google Drive folder ID configured. Users not saved to Drive.")
     
     def _save_local_users(self, users_data):
-        # Save users to local file
+        """Save users to local file"""
+        # Make sure data directory exists
+        os.makedirs(os.path.dirname(self.users_file), exist_ok=True)
         with open(self.users_file, 'w') as f:
             json.dump(users_data, f, indent=2)
     
     def _save_drive_users(self, users_data):
-        # Save users to Google Drive
+        """Save users to Google Drive"""
         try:
-            # Make sure we're actually uploading the file to drive
             result = upload_to_drive(users_data, "users.json", self.google_drive_folder_id)
             if result:
                 print(f"User data uploaded to Drive with ID: {result}")
+                return True
             else:
                 print("Failed to upload user data to Drive")
+                return False
         except Exception as e:
             print(f"Error saving users to Drive: {str(e)}")
+            return False
     
     def create_user(self, username, password):
         # Create a new user
@@ -158,4 +182,5 @@ class UserManager:
         self._save_users()
         return True
 
+# Initialize the user manager singleton
 user_manager = UserManager()

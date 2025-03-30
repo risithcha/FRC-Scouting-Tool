@@ -63,7 +63,10 @@ def create_app(config_class=Config):
     os.makedirs(app.config["LOGS_DIR"], exist_ok=True)
     
     # Initialize user manager with the app and ensure it has the drive folder ID
+    from app.services.user_service import user_manager
+    print("Initializing user manager in app factory")
     user_manager.init_app(app)
+    print("User manager initialized successfully")
     
     # Register blueprints
     from app.blueprints.main import main_bp

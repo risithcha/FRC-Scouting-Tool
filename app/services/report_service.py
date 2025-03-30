@@ -193,22 +193,28 @@ class ReportService:
     
     @staticmethod
     def sync_users_from_drive():
-        # Sync users from Google Drive
+        """Sync users from Google Drive"""
         drive_folder_id = current_app.config["GOOGLE_DRIVE_FOLDER_ID"]
+        
+        print(f"Syncing users from Google Drive folder ID: {drive_folder_id}")
         
         # Find users file in Drive
         file_info = find_file_by_name("users.json", drive_folder_id)
         
         if not file_info:
+            print("No users.json file found on Google Drive")
             return {"status": "No users file found on Drive"}
         
         # Download users file
+        print(f"Downloading users.json with ID: {file_info['id']}")
         content = download_file_from_drive(file_info['id'])
         if not content:
+            print("Failed to download users.json content")
             return {"status": "Failed to download users file"}
         
         try:
             drive_users = json.loads(content)
+            print(f"Successfully parsed users.json from Drive")
             
             # Load current local users
             local_path = os.path.join("data", "users.json")
@@ -216,19 +222,29 @@ class ReportService:
             if os.path.exists(local_path):
                 with open(local_path, 'r') as f:
                     local_users = json.load(f)
+                    print(f"Loaded local users.json with {len(local_users)} users")
             
-            local_usernames = {user["username"].lower() for user in local_users.get("users", [])}
+            # Simple merge: Add any users from drive that don't exist locally
+            local_usernames = set()
+            if isinstance(local_users, dict):
+                local_usernames = set(local_users.keys())
+            
             new_users_count = 0
             
-            for drive_user in drive_users.get("users", []):
-                if drive_user["username"].lower() not in local_usernames:
-                    local_users.setdefault("users", []).append(drive_user)
-                    new_users_count += 1
+            if isinstance(drive_users, dict):
+                for username, user_data in drive_users.items():
+                    if username not in local_usernames:
+                        local_users[username] = user_data
+                        new_users_count += 1
+                        print(f"Added user {username} from Drive")
             
             # Save updated users file
             if new_users_count > 0:
                 with open(local_path, 'w') as f:
                     json.dump(local_users, f, indent=2)
+                print(f"Saved {new_users_count} new users to local users.json")
+            else:
+                print("No new users to add from Drive")
             
             return {
                 "status": "success",
@@ -236,6 +252,7 @@ class ReportService:
             }
         
         except Exception as e:
+            print(f"Error syncing users from Drive: {str(e)}")
             return {"status": f"Error: {str(e)}"}
 
 report_service = ReportService()
